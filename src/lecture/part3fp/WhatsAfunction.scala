@@ -26,4 +26,14 @@ object WhatsAfunction extends App {
   *   - what's the type of this function
   *   - how to do it
   * */
+
+  // curried function
+
+  val superAdder: Function1[Int, Function1[Int, Int]] = new Function[Int, Function1[Int, Int]] {
+    override def apply(x: Int): Function1[Int, Int] = new Function[Int, Int] {
+      override def apply(y: Int): Int = x + y
+    }
+  }
+
+  println(superAdder(2)(4))
 }
