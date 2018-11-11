@@ -35,5 +35,9 @@ object WhatsAfunction extends App {
     }
   }
 
+//  val superAdderLambda: (Int => (Int => Int)) = (x) => (y) => x + y
+  val superAdderLambda = (x: Int) => (y: Int) => x + y
+
   println(superAdder(2)(4))
+  println(superAdderLambda(2)(4))
 }

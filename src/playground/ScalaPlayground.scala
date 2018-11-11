@@ -42,17 +42,21 @@ class MyListImpl[T](h: T, t: MyList[T]) extends MyList[T] {
 }
 
 object ScalaPlayground extends App {
-  val intList: MyList[Int] = Empty.add(5).add(10).add(12)
+  val intList: MyList[Int] = Empty.add(5).add(9).add(12)
   println("List: " + intList)
-  println("Map List: " + intList.map(new Function1[Int, Int] {
-    override def apply(item: Int) = item * 2
-  }))
-  println("Odd list: " + intList.filter(new Function1[Int, Boolean] {
-    override def apply(item: Int): Boolean = item % 2 == 1
-  }))
-  println("flatMap: " + intList.flatMap[Int](new Function1[Int, MyList[Int]] {
-    override def apply(item: Int): MyList[Int] =
-      new MyListImpl[Int](item, new MyListImpl[Int](item + 1, Empty))
-  }))
+//  println("Map List: " + intList.map(new Function1[Int, Int] {
+//    override def apply(item: Int) = item * 2
+//  }))
+  println("Map List: " + intList.map(_ * 2))
+
+//  println("Odd list: " + intList.filter(new Function1[Int, Boolean] {
+//    override def apply(item: Int): Boolean = item % 2 == 1
+//  }))
+  println("Odd list: " + intList.filter(_ % 2 == 1))
+//  println("flatMap: " + intList.flatMap[Int](new Function1[Int, MyList[Int]] {
+//    override def apply(item: Int): MyList[Int] =
+//      new MyListImpl[Int](item, new MyListImpl[Int](item + 1, Empty))
+//  }))
+  println("flatMap: " + intList.flatMap[Int](item => new MyListImpl(item, new MyListImpl(item + 1, Empty))))
 
 }
