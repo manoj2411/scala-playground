@@ -6,9 +6,9 @@ trait MyList[+T] {
   def add[B >: T](item: B): MyList[B]
   def printList: String
   override def toString = "[  " + printList + "]"
-  def map[B](transformer: MyTransformer[T, B]): MyList[B]
-  def filter(predicate: MyPredicate[T]): MyList[T]
-  def flatMap[B](transformer: MyTransformer[T, MyList[B]]): MyList[B]
+  def map[B](transformer: T => B): MyList[B]
+  def filter(predicate: T => Boolean): MyList[T]
+  def flatMap[B](transformer: T => MyList[B]): MyList[B]
   def ++[B >: T](list: MyList[B]): MyList[B]
 }
 
@@ -17,9 +17,9 @@ object Empty extends MyList[Nothing] {
   def tail = throw new NoSuchElementException
   def add[B >: Nothing](item: B) = new MyListImpl(item, Empty)
   def printList: String = ""
-  def map[B](transformer: MyTransformer[Nothing, B]) = Empty
-  def filter(predicate: MyPredicate[Nothing]) = Empty
-  def flatMap[B](transformer: MyTransformer[Nothing, MyList[B]]) = Empty
+  def map[B](transformer: Nothing => B) = Empty
+  def filter(predicate: Nothing => Boolean) = Empty
+  def flatMap[B](transformer: Nothing => MyList[B]) = Empty
   def ++[B >: Nothing](list: MyList[B]) = list
 }
 
@@ -28,38 +28,30 @@ class MyListImpl[T](h: T, t: MyList[T]) extends MyList[T] {
   def tail = t
   def add[B >: T](item: B) = new MyListImpl(item, this)
   def printList = head + " " + tail.printList
-  def map[B](transformer: MyTransformer[T,B]) =
-    new MyListImpl(transformer.transform(head), tail.map(transformer))
-  def filter(predicate: MyPredicate[T]) =
-    if (predicate.test(head)) new MyListImpl(head, tail.filter(predicate))
+  def map[B](transformer: T => B) =
+    new MyListImpl(transformer(head), tail.map(transformer))
+  def filter(predicate: T => Boolean) =
+    if (predicate(head)) new MyListImpl(head, tail.filter(predicate))
     else tail.filter(predicate)
   def ++[B >: T](list: MyList[B]) =
     new MyListImpl[B](head, tail ++ list)
 
   //  flatMap([n, n + 1])
-  def flatMap[B](transformer: MyTransformer[T, MyList[B]]) =
-    transformer.transform(head) ++ tail.flatMap(transformer)
-}
-
-trait MyPredicate[-A] {
-  def test(item: A): Boolean
-}
-
-trait MyTransformer[-A,B] {
-  def transform(item: A): B
+  def flatMap[B](transformer: T => MyList[B]) =
+    transformer(head) ++ tail.flatMap(transformer)
 }
 
 object ScalaPlayground extends App {
   val intList: MyList[Int] = Empty.add(5).add(10).add(12)
   println("List: " + intList)
-  println("Map List: " + intList.map(new MyTransformer[Int, Int] {
-    override def transform(item: Int) = item * 2
+  println("Map List: " + intList.map(new Function1[Int, Int] {
+    override def apply(item: Int) = item * 2
   }))
-  println("Odd list: " + intList.filter(new MyPredicate[Int] {
-    override def test(item: Int): Boolean = item % 2 == 1
+  println("Odd list: " + intList.filter(new Function1[Int, Boolean] {
+    override def apply(item: Int): Boolean = item % 2 == 1
   }))
-  println("flatMap: " + intList.flatMap[Int](new MyTransformer[Int, MyList[Int]] {
-    override def transform(item: Int): MyList[Int] =
+  println("flatMap: " + intList.flatMap[Int](new Function1[Int, MyList[Int]] {
+    override def apply(item: Int): MyList[Int] =
       new MyListImpl[Int](item, new MyListImpl[Int](item + 1, Empty))
   }))
 
