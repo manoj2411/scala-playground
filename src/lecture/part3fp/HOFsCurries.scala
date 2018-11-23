@@ -25,4 +25,12 @@ object HOFsCurries extends App {
   val plusSix = nTimesNew(incrOne, 6)
   println(plusSix(26))
 
+  // custom formatters
+
+  def curriedFormatter(formatter: String)(value: Double): String = formatter.format(value)
+
+  val standardFormatter: (Double => String) = curriedFormatter("%05.2f")
+  val longFormatter: (Double => String) = curriedFormatter("%10.8f")
+  println(standardFormatter(Math.PI))
+  println(longFormatter(Math.PI))
 }
