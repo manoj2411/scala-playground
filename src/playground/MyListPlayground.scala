@@ -14,6 +14,7 @@ trait MyList[+T] {
   // HOFs
   def forEach(fn: T => Unit): Unit
   def sort(fn: (T, T) => Int): MyList[T]
+  def zipWith[B,C](list: MyList[B], fn: (T, B) => C): MyList[C]
 }
 
 object Empty extends MyList[Nothing] {
@@ -29,6 +30,11 @@ object Empty extends MyList[Nothing] {
   // HOFs
   def forEach(fn: Nothing => Unit) = ()
   def sort(fn: (Nothing, Nothing) => Int): MyList[Nothing] = Empty
+  def zipWith[B, C](list: MyList[B], fn: (Nothing, B) => C): MyList[C] =
+    if (!list.isEmpty)
+      throw new RuntimeException("List must be of same length")
+    else
+      Empty
 }
 
 class MyListImpl[T](h: T, t: MyList[T]) extends MyList[T] {
@@ -66,10 +72,15 @@ class MyListImpl[T](h: T, t: MyList[T]) extends MyList[T] {
   }
 
 
+  def zipWith[B, C](list: MyList[B], fn: (T, B) => C): MyList[C] = {
+    if (list.isEmpty) throw new RuntimeException("List must be of same length")
+    new MyListImpl(fn(head, list.head), tail.zipWith(list.tail, fn) )
+  }
+
 }
 
 object MyListPlayground extends App {
-  val intList: MyList[Int] = Empty.add(5).add(9).add(12)
+  val intList: MyList[Int] = Empty.add(5).add(9).add(2).add(12)
   println("List: " + intList)
   //  println("Map List: " + intList.map(new Function1[Int, Int] {
   //    override def apply(item: Int) = item * 2
@@ -90,5 +101,10 @@ object MyListPlayground extends App {
   intList.forEach(println)
 
   println("Sorting: " + intList.sort((a,b) => a - b) )
+
+  val newIntList = Empty.add(20).add(10).add(30).add(5)
+  println("List1: " + intList)
+  println("List2: " + newIntList)
+  println("ZipWith: " + intList.zipWith(newIntList, (x: Int, y: Int) => x * y) )
 
 }
