@@ -15,6 +15,7 @@ trait MyList[+T] {
   def forEach(fn: T => Unit): Unit
   def sort(fn: (T, T) => Int): MyList[T]
   def zipWith[B,C](list: MyList[B], fn: (T, B) => C): MyList[C]
+  def fold[B](initialVal: B)(operator: (B, T) => B): B
 }
 
 object Empty extends MyList[Nothing] {
@@ -35,6 +36,7 @@ object Empty extends MyList[Nothing] {
       throw new RuntimeException("List must be of same length")
     else
       Empty
+  def fold[B](initialVal: B)(operator: (B, Nothing) => B): B = initialVal
 }
 
 class MyListImpl[T](h: T, t: MyList[T]) extends MyList[T] {
@@ -71,11 +73,13 @@ class MyListImpl[T](h: T, t: MyList[T]) extends MyList[T] {
     insert(head, sortedTail)
   }
 
-
   def zipWith[B, C](list: MyList[B], fn: (T, B) => C): MyList[C] = {
     if (list.isEmpty) throw new RuntimeException("List must be of same length")
     new MyListImpl(fn(head, list.head), tail.zipWith(list.tail, fn) )
   }
+
+  def fold[B](initialVal: B)(operator: (B, T) => B): B =
+    tail.fold(operator(initialVal, head))(operator)
 
 }
 
@@ -107,4 +111,5 @@ object MyListPlayground extends App {
   println("List2: " + newIntList)
   println("ZipWith: " + intList.zipWith(newIntList, (x: Int, y: Int) => x * y) )
 
+  println("Fold: " + intList.fold(0)(_ + _))
 }
