@@ -41,4 +41,19 @@ object Options extends App {
   println(conn.map(x => x.connected).getOrElse("Not connected!"))
   //conn.map(x => x.connected).foreach(println)
 
+  // Chained methods
+  config.get("host")
+    .flatMap( host => config.get("port")
+      .flatMap(port => Connection(host, port))
+      .map(con => con.connected))
+    .foreach(println)
+
+  // for comprehensions
+  val connectionStatus = for {
+    _host <- config.get("host")
+    _port <- config.get("port")
+    _connection <- Connection(_host, _port)
+  } yield _connection.connected
+  connectionStatus.foreach(println)
+
 }
