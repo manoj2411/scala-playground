@@ -1,6 +1,6 @@
 package lecture.part3fp
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Random, Success, Try}
 
 object HandlingFailure extends App {
   val _success = Success(24)
@@ -23,5 +23,31 @@ object HandlingFailure extends App {
   println(_success.map(_ / 2))
   println(_success.flatMap(x => Success(x * 5)))
   println(_success.filter(_ > 100))
+
+  // Exercise
+  val host = "localhost"
+  val port = "3000"
+  def renderHtml(html: String) = println(html)
+
+  class Connection {
+    def get(url: String): String = {
+      val random = new Random(System.nanoTime)
+      if (random.nextBoolean) "<doctype abc/><html>...</html>"
+      else throw new RuntimeException("connection broken!")
+    }
+    def getSafe(url: String): Try[String] = Try(get(url))
+  }
+  object HttpService {
+    val random = new Random(System.nanoTime)
+
+    def getConnection(host: String, port: String): Connection =
+      if (random.nextBoolean) new Connection
+      else throw new RuntimeException("port already in use!")
+    def getConnectionSafe(host: String, port: String): Try[Connection] = Try(getConnection(host, port))
+  }
+  // if you get the html page from the connection , print it i.e. call renderHtml
+  HttpService.getConnectionSafe(host, port)
+    .flatMap(c => c.getSafe("/"))
+    .foreach(renderHtml)
 
 }
