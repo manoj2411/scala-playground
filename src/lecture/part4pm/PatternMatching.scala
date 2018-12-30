@@ -26,4 +26,48 @@ object PatternMatching extends App {
   }
   println(greeting)
 
+  /* Exercise
+    Simple function uses PM, takes an expression and return human readable form
+    ex:
+      Sum(Number(3), Number(2), Number(1)) => "3 + 2 + 1"
+      Prod(Sum(Number(1), Number(2)), Number(3)) => "(1 + 2) * 3"
+      Sum(Prod(Number(2), Number(1)), Number(3)) => 2 * 1 + 3
+  */
+  trait Expr
+  case class Number(n: Int) extends Expr
+  case class Sum(e1: Expr, e2: Expr) extends Expr
+  case class Prod(e1: Expr, e2: Expr) extends Expr
+
+  def show(exp: Expr): String = exp match {
+    case Sum(a, b) => s"${show(a)} + ${show(b)}"
+    case Number(n) => s"$n"
+    case Prod(a, b) if a.isInstanceOf[Number] && b.isInstanceOf[Number] =>
+      s"${show(a)} * ${show(b)}"
+    case Prod(a, b) if a.isInstanceOf[Number] =>
+      s"${show(a)} * ( ${show(b)})"
+    case Prod(a, b) if b.isInstanceOf[Number] =>
+      s"(${show(a)}) * ${show(b)}"
+    case Prod(a,b) => s"(${show(a)}) * (${show(b)})"
+  }
+
+  def showNew(exp: Expr): String = exp match {
+    case Number(n) => s"$n"
+    case Sum(a, b) => s"${showNew(a)} + ${showNew(b)}"
+    case Prod(a, b) =>
+      def showParenthesis(ex: Expr) = ex match {
+        case Number(_) => showNew(ex)
+        case Prod(_, _) => showNew(ex)
+        case _ => s"(${showNew(ex)})"
+      }
+      showParenthesis(a) + " * " + showParenthesis(b)
+  }
+
+  println(show(Sum(Number(3), Number(2))))
+  println(showNew(Sum(Number(3), Number(2))))
+  println(show(Prod(Sum(Number(1), Number(2)), Number(3))))
+  println(showNew(Prod(Sum(Number(1), Number(2)), Number(3))))
+  println(show(Prod(Sum(Number(1), Number(2)), Sum(Number(3), Number(10)))))
+  println(showNew(Prod(Sum(Number(1), Number(2)), Sum(Number(3), Number(10)))))
+  println(show(Sum(Prod(Number(2), Number(1)), Number(3))))
+  println(showNew(Sum(Prod(Number(2), Number(1)), Number(3))))
 }
