@@ -54,4 +54,38 @@ object AdvancedPatternMatching extends App {
   println(newMathProp)
   // A quick way to write tests for pattern matching is to define Singleton object with unapply which returns Boolean.
   // The advantage of this approach is that you can reuse these boolean and tests in other pattern matches
+  // ===================================================
+
+  // Infix patterns, it'll work only when you 2 things in pattern.
+  case class Or[A, B](a: A, b: B) // In scala this is called Either
+  val either = Or(4, "Four")
+  val desc = either match {
+    // case Or(number, string) => s"$number is written as $string"
+    // ==
+    case number Or string => s"$number is written as $string"
+  }
+  println(desc)
+
+  // Decomposing sequences
+  abstract class MyList[+A] {
+    def head: A = ???
+    def tail: MyList[A] = ???
+  }
+  case object Empty extends MyList[Nothing]
+  case class Cons[+A](override val head: A, override val tail: MyList[A]) extends MyList[A]
+  object MyList {
+    def unapplySeq[A](list: MyList[A]): Option[Seq[A]] =
+      if (list == Empty) Some(Seq.empty)
+      else unapplySeq(list.tail).map(list.head +: _)
+  }
+  val myList: MyList[Int] = Cons(2, Cons(4, Cons(5, Empty)))
+  val decomposed = myList match {
+    case MyList(2,4,_*) => "Starting with 2, 4"
+    case _ => "Something else"
+  }
+  println(decomposed)
+
+  // Custom return types for unapply: The DS we want to retunr only needs to have 2 methods:
+  // isEmpty: Boolean, get: something
+
 }
