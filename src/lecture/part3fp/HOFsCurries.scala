@@ -17,7 +17,7 @@ object HOFsCurries extends App {
   // fn nTimes take a fn and take number and returns another fn which is application
   // of this fn ntimes which we can then use it for any value we want.
   val incrOne = (x: Int) => x + 1
-  
+
   def nTimesNew(fn: Int => Int, n: Int): Int => Int =
     if (n <= 0) (x: Int) => x
     else (x: Int) => nTimesNew(fn, n - 1)(fn(x))
@@ -25,12 +25,12 @@ object HOFsCurries extends App {
   val plusSix = nTimesNew(incrOne, 6)
   println(plusSix(26))
 
-  // custom formatters
-
+  // Functions with multiple parameter list - easy curried functions
   def curriedFormatter(formatter: String)(value: Double): String = formatter.format(value)
-
+  // using this create multiple formatters and use.
   val standardFormatter: (Double => String) = curriedFormatter("%05.2f")
   val longFormatter: (Double => String) = curriedFormatter("%10.8f")
   println(standardFormatter(Math.PI))
   println(longFormatter(Math.PI))
+
 }
