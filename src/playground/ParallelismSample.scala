@@ -11,23 +11,25 @@ object ParallelismSample extends App {
     implicit val ec = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(5))
 
   val source = Map(("m1",ServiceOne), ("m2",ServiceTwo), ("m3",ServiceThree))
-//    val res = Future.sequence(source.map(x => (x._1 -> x._2.run)))
-    val s1 = source("m1").run
-    val s2 = source("m3").run
-    val s3 = source("m2").run
 
-    val res = for {
-      r1 <- s1
-      r2 <- s2
-      r3 <- s3
-    } yield Map("r1" -> r1, "r2" -> r2, "r3" -> r3)
-//    val futures = for (elem <- source.values) {}(x => x.run)
-  //
-  //  val res = Future.sequence(futures)
-    val resp = Await.result(res, 500 millis)
+//    val s1 = source("m1").run
+//    val s2 = source("m3").run
+//    val s3 = source("m2").run
+//
+//    val res = for {
+//      r1 <- s1
+//      r2 <- s2
+//      r3 <- s3
+//    } yield Map("r1" -> r1, "r2" -> r2, "r3" -> r3)
+
+    val futures1 = source.values.map(_.run)
+    val futures2 = for (elem <- source.values) yield elem.run
+
+    val res = Future.sequence(futures1)
+    val resp = Await.result(res, 300 millis)
 
     println(s"Response: $resp")
-  println("Stopping...")
+    println("Stopping...")
 
   //  Thread.sleep(500)
 
