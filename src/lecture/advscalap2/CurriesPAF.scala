@@ -25,4 +25,21 @@ object CurriesPAF extends App {
 
   // Partial function applications
   val add5 = curriedAdder(5) _ // telling compiler to do ETA-EXPANSION for me and convert it to a function and it'll not throw any error now.
+
+  // Exercise:
+  val simpleAddFn = (a: Int, b: Int) => a + b
+  def simpleAddMethod(a: Int, b: Int) = a + b
+  def curriedAddMethod(a: Int)(b: Int) = a + b
+  // add7: Int => Int = y => 7 + y
+  // add as many implementations of add9 using the above
+
+  val add7_1 = (x: Int) => simpleAddFn(7, x)
+  val add7_2 = simpleAddFn.curried(7)
+
+  val add7_3 = curriedAdder(7)    // PAF
+  val add7_4 = curriedAdder(7)(_) // PAF - alternative syntax
+
+  val add7_5 = simpleAddMethod(7, _: Int) // alternative syntax for turning method into function values
+  val add7_6 = simpleAddFn(7, _: Int)
+
 }
