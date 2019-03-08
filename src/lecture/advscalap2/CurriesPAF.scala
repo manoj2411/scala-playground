@@ -36,10 +36,17 @@ object CurriesPAF extends App {
   val add7_1 = (x: Int) => simpleAddFn(7, x)
   val add7_2 = simpleAddFn.curried(7)
 
-  val add7_3 = curriedAdder(7)    // PAF
-  val add7_4 = curriedAdder(7)(_) // PAF - alternative syntax
+  val add7_3 = curriedAddMethod(7) _   // PAF
+  val add7_4 = curriedAddMethod(7)(_) // PAF - alternative syntax
 
   val add7_5 = simpleAddMethod(7, _: Int) // alternative syntax for turning method into function values
   val add7_6 = simpleAddFn(7, _: Int)
 
+  // Underscore is very powerful
+  def concat(x: String, y: String, z: String) = x + y + z
+  val insertName = concat("Hello, I am ", _: String, ". How are you?") // x: String => concat(hey, x, howAreYou)
+  println(insertName("Manoj"))
+
+  val fillTheBlanks = concat("Hello, ", _: String, _: String) // (x: String, y: String) => concat(hey, x, y)
+  println(fillTheBlanks("Tom", " I am awesome!"))
 }
