@@ -1,5 +1,6 @@
 package lecture.advscalap2
 
+// PAF - Partially Applied Function
 object CurriesPAF extends App {
 
   // curried functions: functions returning other function as results.
@@ -49,4 +50,26 @@ object CurriesPAF extends App {
 
   val fillTheBlanks = concat("Hello, ", _: String, _: String) // (x: String, y: String) => concat(hey, x, y)
   println(fillTheBlanks("Tom", " I am awesome!"))
+
+  /* Exercise:
+  1. Process list of number and return string representation with different formats
+      User %4.2f, %8.6f and %14.12f with a curried formatter Fn. ex: println("%8.6f".format(22/7))
+        println("PI: [%4.2f]".format(22/7f))
+        println("PI: [%8.6f]".format(22/7f))
+        println("PI: [%14.12f]".format(22/7f))
+  */
+
+  // 1. %4.2f, %8.6f and %14.12f
+  def formatter(formatType: String)(x: Float) = formatType.format(x)
+
+  val smallFormat = formatter("%4.2f") _ // LIFT this to a Fn value
+  val midFormat = formatter(" %8.6f ")(_)
+  val bigFormat = formatter(" %8.6f ")(_)
+  val list = List(22/7f, 33/7f, 11/3f, 13/3f)
+  println(list.map(smallFormat))
+  println(list.map(midFormat))
+  println(list.map(bigFormat))
+
+
+
 }
