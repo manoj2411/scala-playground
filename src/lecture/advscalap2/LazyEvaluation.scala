@@ -15,7 +15,7 @@ object LazyEvaluation extends App {
 
   // Be very careful if you use lazy values and have side effects in your program.
   lazy val lazyCondn = sideEffectCondn
-  println(if (simpleCondn && lazyCondn) "Yes" else "No") // It'll not print "Bool"
+//  println(if (simpleCondn && lazyCondn) "Yes" else "No") // It'll not print "Bool"
 
   // in conjunction with call by name. Common bug
   def byNameMethod(n: => Int): Int = {
@@ -30,7 +30,7 @@ object LazyEvaluation extends App {
     Thread.sleep(1000)
     24
   }
-  println(byNameMethod(retrieveProcessing))
+  // println("[byNameMethod]: " + byNameMethod(retrieveProcessing))
 
   def lessThan30(n: Int): Boolean = {
     println(s"$n is less than 30?")
@@ -44,14 +44,14 @@ object LazyEvaluation extends App {
   val numbers = List(1, 24, 40, 5, 27)
   val lt30 = numbers.filter(lessThan30)
   val gt20 = lt30.filter(greaterThan20)
-  println(gt20)
-  println()
+  //println(gt20)
+  //println()
 
   // lazy filtering
   val lazyLt30 = numbers.withFilter(lessThan30) // lazy vals under the hood
   val lazyGt20 = lazyLt30.withFilter(greaterThan20)
-  println(lazyGt20) // it'll not trigger evaluation
-  lazyGt20.foreach(println) // it evaluate on need basis.
+  //println(lazyGt20) // it'll not trigger evaluation
+  //lazyGt20.foreach(println) // it evaluate on need basis.
 
   // for-comprehensions use withFilter with guards
   for {
@@ -65,25 +65,8 @@ object LazyEvaluation extends App {
       naturals.take(100).foreach(println) - print 100 naturals
       naturals.foreach(println) - will crash, infinite!
       naturals.map(_ * 2) // stream of all even numbers, potentially infinite
+
+      Solution moved to => StreamsPlayground
   */
-  abstract class MyStream[+A] {
-    def isEmpty: Boolean
-    def head: A
-    def tail: MyStream[A]
 
-    def #::[B >: A](element: B): MyStream[B] //prepend
-    def ++[B >: A](anotherSteram: MyStream[B]):MyStream[B] // concat streams
-
-    def foreach(f: A => Unit): Unit
-    def map[B](f: A => B): MyStream[B]
-    def flatMap[B](f: A => MyStream[B]): MyStream[B]
-    def filter(predicate: A => Boolean): MyStream[A]
-
-    def take(n: Int): MyStream[A]
-    def takeAsList(n: Int): List[A]
-  }
-
-  object MyStream {
-    def from[A](start: A)(generator: A => A): MyStream[A] = ???
-  }
 }
