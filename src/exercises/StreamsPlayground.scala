@@ -1,5 +1,7 @@
 package exercises
 
+import scala.annotation.tailrec
+
 /* Exercise: implement a lazy evaluated, singly linked STREAM of elements.
     naturals = MyStream.from(1)(x => x + 1) - stream of natural numbers, potentially infinite
     naturals.take(100) - lazily evaluated stream of the first 100 naturals, finite stream
@@ -22,11 +24,11 @@ abstract class MyStream[+A] {
   def filter(predicate: A => Boolean): MyStream[A]
 
   def take(n: Int): MyStream[A]
-  def takeAsList(n: Int): List[A]
-}
-
-object MyStream {
-  def from[A](start: A)(generator: A => A): MyStream[A] = ???
+  def takeAsList(n: Int): List[A] = take(n).toList()
+  @tailrec
+  final def toList[B >: A](acc: List[B] = Nil): List[B] =
+    if (isEmpty) acc.reverse
+    else tail.toList(head :: acc)
 }
 
 object EmptyStream extends MyStream[Nothing] {
@@ -43,7 +45,7 @@ object EmptyStream extends MyStream[Nothing] {
   def filter(predicate: Nothing => Boolean): MyStream[Nothing] = this
 
   def take(n: Int): MyStream[Nothing] = this
-  def takeAsList(n: Int): List[Nothing] = Nil // Nil– Represents an emptry List of anything of zero length
+  // def takeAsList(n: Int): List[Nothing] = Nil // Nil– Represents an emptry List of anything of zero length
 }
 
 // _tail "call by name" is required to make it lazy
@@ -72,13 +74,28 @@ class NonEmptyStream[A](_head: A, _tail: => MyStream[A]) extends MyStream[A] {
 
   def take(n: Int): MyStream[A] =
     if (n <= 0) EmptyStream
-//    else if (n == 1) new NonEmptyStream(head, EmptyStream)
+    // else if (n == 1) new NonEmptyStream(head, EmptyStream)
     else new NonEmptyStream(head, tail.take(n - 1))
-
-  def takeAsList(n: Int): List[A] = ???
-
 }
 
-object StreamsPlayground extends App {
+object MyStream {
+  def from[A](start: A)(generator: A => A): MyStream[A] =
+    new NonEmptyStream(start, MyStream.from(generator(start))(generator))
+}
 
+
+object StreamsPlayground extends App {
+  val numbers = MyStream.from(0)(_ + 1)
+  // println(numbers.head)
+  // println(numbers.tail.head)
+  // println(numbers.tail.tail.head)
+
+  val startWithMinus1 = -1 #:: numbers
+  // println(numbers.head)
+  // println(numbers.tail.head)
+
+  // numbers.take(10000).foreach(println)
+
+  // map & flatMap
+  println(numbers.map(_ * 2).take(50).toList())
 }
