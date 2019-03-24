@@ -16,7 +16,7 @@ abstract class MyStream[+A] {
   def tail: MyStream[A]
 
   def #::[B >: A](element: B): MyStream[B] //prepend
-  def ++[B >: A](anotherStream: MyStream[B]):MyStream[B] // concat streams
+  def ++[B >: A](anotherStream: => MyStream[B]):MyStream[B] // concat streams
 
   def foreach(f: A => Unit): Unit
   def map[B](f: A => B): MyStream[B]
@@ -37,7 +37,7 @@ object EmptyStream extends MyStream[Nothing] {
   def tail = throw new NoSuchElementException("no tail for empty stream")
 
   def #::[B >: Nothing](element: B): MyStream[B] = new NonEmptyStream(element, this)
-  def ++[B >: Nothing](anotherStream: MyStream[B]):MyStream[B] = anotherStream // concat streams
+  def ++[B >: Nothing](anotherStream: => MyStream[B]):MyStream[B] = anotherStream // concat streams
 
   def foreach(f: Nothing => Unit): Unit = ()
   def map[B](f: Nothing => B): MyStream[B] = this
@@ -59,7 +59,7 @@ class NonEmptyStream[A](_head: A, _tail: => MyStream[A]) extends MyStream[A] {
 
   // NonEmptyStream(_, tail) - tail in this case lazily evaluated,
   def #::[B >: A](element: B): MyStream[B] = new NonEmptyStream(element, this) //prepend
-  def ++[B >: A](anotherStream: MyStream[B]):MyStream[B] = new NonEmptyStream(head, tail ++ anotherStream) // concat streams
+  def ++[B >: A](anotherStream: => MyStream[B]):MyStream[B] = new NonEmptyStream(head, tail ++ anotherStream) // concat streams
 
   // it forces the evaluation.
   def foreach(f: A => Unit): Unit = {
@@ -98,4 +98,5 @@ object StreamsPlayground extends App {
 
   // map & flatMap
   println(numbers.map(_ * 2).take(50).toList())
+  println(numbers.flatMap(x => new NonEmptyStream(x, new NonEmptyStream(x + 1, EmptyStream))).take(10).toList())
 }
