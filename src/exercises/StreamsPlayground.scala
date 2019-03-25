@@ -97,6 +97,18 @@ object StreamsPlayground extends App {
   // numbers.take(10000).foreach(println)
 
   // map & flatMap
-  println(numbers.map(_ * 2).take(50).toList())
-  println(numbers.flatMap(x => new NonEmptyStream(x, new NonEmptyStream(x + 1, EmptyStream))).take(10).toList())
+  // println(numbers.map(_ * 2).take(50).toList())
+  // println(numbers.flatMap(x => new NonEmptyStream(x, new NonEmptyStream(x + 1, EmptyStream))).take(10).toList())
+  println(numbers.filter(_ < 20).take(10).toList())
+
+  /* Exercise on streams
+  1. stream of fibonacci numbers
+  2. stream of primer numbers with Eratosthenes' sieve
+      [2 3 4 5 6 7 ...]
+      filter all divisible by 2
+      [2 3 5 7 9 11 ...]
+      filter all divisible by 3
+      [2 5 7 11 13 17...]
+      filter all divisible by 5
+  */
 }
