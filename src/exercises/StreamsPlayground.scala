@@ -74,7 +74,7 @@ class NonEmptyStream[A](_head: A, _tail: => MyStream[A]) extends MyStream[A] {
 
   def take(n: Int): MyStream[A] =
     if (n <= 0) EmptyStream
-    // else if (n == 1) new NonEmptyStream(head, EmptyStream)
+    else if (n == 1) new NonEmptyStream(head, EmptyStream)
     else new NonEmptyStream(head, tail.take(n - 1))
 }
 
@@ -99,7 +99,7 @@ object StreamsPlayground extends App {
   // map & flatMap
   // println(numbers.map(_ * 2).take(50).toList())
   // println(numbers.flatMap(x => new NonEmptyStream(x, new NonEmptyStream(x + 1, EmptyStream))).take(10).toList())
-  println(numbers.filter(_ < 20).take(10).toList())
+  println(numbers.filter(_ < 10).take(10).toList())
 
   /* Exercise on streams
   1. stream of fibonacci numbers
