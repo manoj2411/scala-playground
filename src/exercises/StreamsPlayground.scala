@@ -103,19 +103,27 @@ object StreamsPlayground extends App {
 
   /* Exercise on streams
   1. stream of fibonacci numbers
-  2. stream of primer numbers with Eratosthenes' sieve
-      [2 3 4 5 6 7 ...]
-      filter all divisible by 2
-      [2 3 5 7 9 11 ...]
-      filter all divisible by 3
-      [2 5 7 11 13 17...]
-      filter all divisible by 5
   */
-
   def fibonacci(first: BigInt = 1, second: BigInt = 1): MyStream[BigInt] =
     new NonEmptyStream(first, fibonacci(second, first + second))
-  println(fibonacci().take(200).toList())
+  // println(fibonacci().take(200).toList())
 
+  /* Exercise on streams
+   2. stream of primer numbers with Eratosthenes' sieve
+     [2 3 4 5 6 7 ...]
+     filter all divisible by 2
+     [2 3 5 7 9 11 ...]
+     filter all divisible by 3
+     [2 5 7 11 13 17...]
+     filter all divisible by 5
+  */
+  // eratosthenes sieve
+  // 2 eratosthenes  applied to numbers filtered by n % 2 != 0
+  def eratosthenes(numbers: MyStream[Int]): MyStream[Int] =
+    if (numbers.isEmpty) numbers
+    else new NonEmptyStream(numbers.head, eratosthenes(numbers.tail.filter(_ % numbers.head != 0)))
 
-
+  val nPrimes = eratosthenes(MyStream.from(2)(_ + 1)).take(100)
+  println(nPrimes.toList())
 }
+
