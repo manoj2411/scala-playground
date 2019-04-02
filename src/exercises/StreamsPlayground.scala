@@ -99,7 +99,7 @@ object StreamsPlayground extends App {
   // map & flatMap
   // println(numbers.map(_ * 2).take(50).toList())
   // println(numbers.flatMap(x => new NonEmptyStream(x, new NonEmptyStream(x + 1, EmptyStream))).take(10).toList())
-  println(numbers.filter(_ < 10).take(10).toList())
+  // println(numbers.filter(_ < 10).take(10).toList())
 
   /* Exercise on streams
   1. stream of fibonacci numbers
@@ -111,4 +111,11 @@ object StreamsPlayground extends App {
       [2 5 7 11 13 17...]
       filter all divisible by 5
   */
+
+  def fibonacci(first: BigInt = 1, second: BigInt = 1): MyStream[BigInt] =
+    new NonEmptyStream(first, fibonacci(second, first + second))
+  println(fibonacci().take(200).toList())
+
+
+
 }
