@@ -63,4 +63,13 @@ object Monads extends App {
   flatMapped.result // using lazy evaluation by previous eval
   anotherFlatMapped.result // using lazy evaluation by previous eval
 
+  /* Exercise
+  2. Monads = unit + flatMap === unit + map + flatten
+    Monad[T] {
+      def flatMap[B](fn: A => Monad[B]): Monad[B] // assume its implemented.
+      def map[B](fn: A => B): Monad[B] = flatMap( x => apply(f(x)))
+      def flatten(monad: Monad[Monad[A]]): Monad[A] = monad.flatMap()
+    }
+    Think it as a List
+  */
 }
