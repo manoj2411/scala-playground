@@ -32,5 +32,35 @@ object Monads extends App {
     throw new RuntimeException("testing monad!")
   }
 
-  println(attempt)
+  // println(attempt)
+
+  /* Exercise
+  1. Implement a Lazy[T] monad. Computation will be executed only when its needed.
+    - create unit/apply
+    - create flatMap
+  */
+  class Lazy[+A](value: => A) {
+    lazy val result = value
+    def flatMap[B](fn: (=> A) => Lazy[B]): Lazy[B] = fn(result)
+
+  }
+  object Lazy {
+    def apply[A](value: => A): Lazy[A] = new Lazy(value)
+  }
+
+  val lazzy = Lazy {
+    println("long processing!")
+    24
+  }
+  val flatMapped = lazzy.flatMap(v => Lazy{
+    v * 10
+  })
+  val anotherFlatMapped = lazzy.flatMap(v => Lazy{
+    v * 10
+  })
+
+  flatMapped.result
+  flatMapped.result // using lazy evaluation by previous eval
+  anotherFlatMapped.result // using lazy evaluation by previous eval
+
 }
