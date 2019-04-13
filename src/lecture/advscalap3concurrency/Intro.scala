@@ -58,7 +58,8 @@ object Intro extends App {
     Thread.sleep(10)
     if (account.amount != 2000 ) println(s"Dispute: ${account}")
   }
-  // use synchronised() to solve concurrency problem (option1)
+  // Solution #1 to race condition:
+  //  use synchronised() to solve concurrency problem (option1)
   def safeBuy(account: BankAccount, thing: String, price: Int) = {
     account.synchronized {
       // with synchronized method, no 2 threads can evaluate this expression at the same time.
@@ -77,5 +78,8 @@ object Intro extends App {
     if (account.amount != 2000 ) println(s"Dispute: ${account}")
   }
 
+  // Solution #2 to race condition:
+  //  add annotation @volatile on a val or var, all reads/writes to val/var will be synchronised.
+  class BankAccountSafe(@volatile var amount: Int) // Its less used since synchronised block give more control.
 
 }
