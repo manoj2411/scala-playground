@@ -55,5 +55,34 @@ object OrganisingImplicits extends App {
   }
 
   import AgeOrdering._
-  println(people.sorted)
+//  println(people.sorted)
+
+  /*
+    Exercise: define orderings
+
+      - totalPrice (mostly used)
+      - by unit count
+      - by price
+  */
+  case class Purchase(nUnits: Int, unitPrice: Double) {
+    val totalPrice = nUnits * unitPrice
+  }
+
+  object Purchase {
+    implicit val totalPriceOrdering: Ordering[Purchase] = Ordering
+      .fromLessThan((x, y) => x.totalPrice > y.totalPrice)
+  }
+
+  object PriceOrdering {
+    implicit val priceOrdering: Ordering[Purchase] = Ordering.fromLessThan((x,y) => x.unitPrice > y.unitPrice)
+  }
+
+  object UnitsOrdering {
+    implicit val unitOrdering: Ordering[Purchase] = Ordering.fromLessThan((x,y) => x.nUnits > y.nUnits)
+  }
+  val purchases = List(Purchase(10, 4), Purchase(15, 3), Purchase(7, 10), Purchase(20, 2))
+
+  import PriceOrdering._
+  println(purchases.sorted)
+
 }
