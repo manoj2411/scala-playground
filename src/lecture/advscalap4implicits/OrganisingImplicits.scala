@@ -29,7 +29,7 @@ object OrganisingImplicits extends App {
       .fromLessThan((x, y) => x.name.compareTo(y.name) < 0)
   }
 
-  println(people.sorted) // if we dont define any implicit ordering it'll fail: No implicit Ordering defined error.
+//  println(people.sorted) // if we dont define any implicit ordering it'll fail: No implicit Ordering defined error.
 
   /* Implicit scope: places where compiler searches for implicit values
       - Local scope
@@ -41,5 +41,19 @@ object OrganisingImplicits extends App {
 
         If we define the above implicit inside object Abc { } it'll not be available but
         if we define it inside object Person it'll be a available since Person type in involved in Ordering.
+
+   Best practices:
+    - If there are many possible values and a GOOD one then define it in companion object, will be picked as default.
+    - If multiple good values, then place them in separate containers and let user import it, ex:
   */
+  object AlphabeticNameOrdering {
+    implicit val alphabeticOrdering: Ordering[Person] = Ordering
+      .fromLessThan((x, y) => x.name.compareTo(y.name) < 0)
+  }
+  object AgeOrdering {
+    implicit val ageOrdering: Ordering[Person] = Ordering.fromLessThan((x, y) => x.age < y.age)
+  }
+
+  import AgeOrdering._
+  println(people.sorted)
 }
