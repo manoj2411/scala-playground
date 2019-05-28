@@ -4,7 +4,7 @@ import java.util.Date
 
 object TypeClasses extends App {
   /*
-  - a type class is a trait that takes a type and describes what operations can be applied to that t  ype.
+  - a type class is a trait that takes a type and describes what operations can be applied to that type.
   */
   // Ex: we have a trait
   trait HTMLWritable {
@@ -61,18 +61,31 @@ object TypeClasses extends App {
     override def serialize(date: Date): String = s"<div>${date.toString}</div>"
   }
 
-  object NotLoggenInUserSerializer extends HTMLSerializer[User] {
+  object NotLoggedInUserSerializer extends HTMLSerializer[User] {
     override def serialize(user: User): String = s"<div>${user.name}</div>"
   }
   /* This HTMLSerializer things is called TYPE CLASS
   - a type class specifies a set of operations that can be applied to a given type
   - Implementors of type class are called type class instances which are singleton objects mostly
   */
-  // A typical type class template: always have a type param, have some actions that returns something.
 
+  // A typical type class template: always have a type param, have some actions that returns something.
   trait MyTypeClassTemplate[T] {
     def action1(value: T): String
     def action2(value: T): List[String]
   }
 
+  /* Equality */
+
+  trait Equal[T] {
+    def apply(x: T, y: T): Boolean
+  }
+  // Compare users by name and compare user by both name * email
+  object NameEquality extends Equal[User] {
+    override def apply(x: User, y: User): Boolean = x.name == y.name
+  }
+
+  object FullEquality extends Equal[User] {
+    override def apply(x: User, y: User): Boolean = NameEquality(x, y) && x.email == y.email
+  }
 }
