@@ -80,15 +80,15 @@ object TypeClasses extends App {
   trait Equal[T] {
     def apply(x: T, y: T): Boolean
   }
+
   // Compare users by name and compare user by both name * email
-  object NameEquality extends Equal[User] {
+  implicit object NameEquality extends Equal[User] {
     override def apply(x: User, y: User): Boolean = x.name == y.name
   }
 
-  object FullEquality extends Equal[User] {
+   object FullEquality extends Equal[User] {
     override def apply(x: User, y: User): Boolean = NameEquality(x, y) && x.email == y.email
   }
-
 
   /* PART 2 */
   object HTMLSerializer {
@@ -106,11 +106,19 @@ object TypeClasses extends App {
   /* The biggest advantage of this approach is, we can just write "HTMLSerializer.serialize(value)" and it'll work if we have
       implicit serializer instance available for the given value type
 
-    Even better design is, have an factory method apply in companion object which take an implicit serializer and jsut returns it
+    Even better design is, have an factory method apply in companion object which take an implicit serializer and just returns it
       The good thing about this design is that when we call apply like: HTMLSerializer[User], we have access to entire type class interface.
       i.e. not only to the serialize methods but other methods as well.
   */
   HTMLSerializer[User] // here we have access to the entire type class interface
 
+  /* EXERCISE: implement type class pattern for Equality type class */
+  object Equal {
+    def apply[T](x: T, y: T)(implicit equality: Equal[T]) = equality(x, y)
+//    def apply[T](implicit equality: Equal[T]) = equality
+  }
+
+  val bob2 = User("Bob", 24, "bob2@gmail.com")
+  println(Equal(bob, bob2))
 
 }
