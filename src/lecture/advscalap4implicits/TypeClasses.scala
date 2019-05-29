@@ -41,6 +41,7 @@ object TypeClasses extends App {
   */
   trait HTMLSerializer[T] {
     def serialize(value: T): String
+    def foo = "bar"
   }
   // Now add a serializer for User
 
@@ -91,7 +92,8 @@ object TypeClasses extends App {
 
   /* PART 2 */
   object HTMLSerializer {
-    def serialize[T](value: T)(implicit serializer: HTMLSerializer[T]): String = serializer.serialize(value)
+//    def serialize[T](value: T)(implicit serializer: HTMLSerializer[T]): String = serializer.serialize(value)
+    def apply[T](implicit serializer: HTMLSerializer[T]) = serializer
   }
   implicit object IntSerializer extends HTMLSerializer[Int] {
     override def serialize(value: Int): String = s"<div style='color: blue'>$value</div>"
@@ -99,13 +101,16 @@ object TypeClasses extends App {
 //  println(HTMLSerializer.serialize(24)(IntSerializer))
   // if we make serializer instances implicit then we can omit 2nd parameter like:
   // implicit object IntSerializer...
-  println(HTMLSerializer.serialize(24))
-  println(HTMLSerializer.serialize(bob))
+  println(HTMLSerializer[Int].serialize(24))
+  println(HTMLSerializer[User].serialize(bob))
   /* The biggest advantage of this approach is, we can just write "HTMLSerializer.serialize(value)" and it'll work if we have
       implicit serializer instance available for the given value type
 
-
+    Even better design is, have an factory method apply in companion object which take an implicit serializer and jsut returns it
+      The good thing about this design is that when we call apply like: HTMLSerializer[User], we have access to entire type class interface.
+      i.e. not only to the serialize methods but other methods as well.
   */
+  HTMLSerializer[User] // here we have access to the entire type class interface
 
 
 }
