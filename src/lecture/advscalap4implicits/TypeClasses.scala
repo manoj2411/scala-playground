@@ -44,12 +44,12 @@ object TypeClasses extends App {
   }
   // Now add a serializer for User
 
-  object UserSerializer extends HTMLSerializer[User] {
+  implicit object UserSerializer extends HTMLSerializer[User] {
     override def serialize(user: User): String =
       s"<div>${user.name} (${user.age} yo) <a href=${user.email} /> </div>"
   }
   val bob = User("Bob", 21, "bob@gmail.com")
-  println(UserSerializer.serialize(bob))
+//  println(UserSerializer.serialize(bob))
 
   /* What is good in this design?
   1. we can define serializers for other types
@@ -76,7 +76,6 @@ object TypeClasses extends App {
   }
 
   /* Equality */
-
   trait Equal[T] {
     def apply(x: T, y: T): Boolean
   }
@@ -88,4 +87,25 @@ object TypeClasses extends App {
   object FullEquality extends Equal[User] {
     override def apply(x: User, y: User): Boolean = NameEquality(x, y) && x.email == y.email
   }
+
+
+  /* PART 2 */
+  object HTMLSerializer {
+    def serialize[T](value: T)(implicit serializer: HTMLSerializer[T]): String = serializer.serialize(value)
+  }
+  implicit object IntSerializer extends HTMLSerializer[Int] {
+    override def serialize(value: Int): String = s"<div style='color: blue'>$value</div>"
+  }
+//  println(HTMLSerializer.serialize(24)(IntSerializer))
+  // if we make serializer instances implicit then we can omit 2nd parameter like:
+  // implicit object IntSerializer...
+  println(HTMLSerializer.serialize(24))
+  println(HTMLSerializer.serialize(bob))
+  /* The biggest advantage of this approach is, we can just write "HTMLSerializer.serialize(value)" and it'll work if we have
+      implicit serializer instance available for the given value type
+
+
+  */
+
+
 }
