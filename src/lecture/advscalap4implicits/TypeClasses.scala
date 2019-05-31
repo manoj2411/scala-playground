@@ -114,11 +114,11 @@ object TypeClasses extends App {
 
   /* EXERCISE: implement type class pattern for Equality type class */
   object Equal {
-    def apply[T](x: T, y: T)(implicit equality: Equal[T]) = equality(x, y)
-//    def apply[T](implicit equality: Equal[T]) = equality
+//    def apply[T](x: T, y: T)(implicit equality: Equal[T]) = equality(x, y)
+    def apply[T](implicit equality: Equal[T]) = equality
   }
 
   val bob2 = User("Bob", 24, "bob2@gmail.com")
-  println(Equal(bob, bob2))
+  println(Equal[User].apply(bob, bob2))
 
 }
