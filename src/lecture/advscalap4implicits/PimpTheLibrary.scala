@@ -1,5 +1,7 @@
 package lecture.advscalap4implicits
 
+import scala.annotation.tailrec
+
 object PimpTheLibrary extends App {
 
   /* type enrichment === pimping
@@ -18,7 +20,7 @@ object PimpTheLibrary extends App {
     def isEven : Boolean = value % 2 == 0
     def isOdd : Boolean = !isEven
   }
-  println(24.isEven, 24.isOdd)
+//  println(24.isEven, 24.isOdd)
 
   /* How it works
 
@@ -31,5 +33,38 @@ object PimpTheLibrary extends App {
    NOTE: complier doesn't do multiple implicit searches. Ex:
     if we a class => implicit class RicherInt(value: RichInt) { def sqrt = ??? } then
     42.sqrt DOESN'T WORK
+
+    Exercise:
+      1. Enrich String class, add following methods:
+        - asInt
+        - encrypt = "John" -> "Lqjo"
+      2. Enrich Int class
+        - times(function) = 1.times(() => ...)
+        - * for List = 3 * List(1, 2) => List(1,2,1,2,1,2)
   */
+
+  implicit class EnrichString(str: String) {
+    def asInt = Integer.valueOf(str)
+//    def encrypt(cypherDistance: Int) = str.map(x => (x + cypherDistance).toChar)
+    def encrypt(cypherDistance: Int) = str.map(x => (x + cypherDistance).asInstanceOf[Char])
+  }
+  println("24".asInt * 10)
+  println("John".encrypt(2))
+
+  implicit class EnrichingInt(value: Int) {
+    def times(f: Int => Unit) =
+      for (i <- 1 to value)  f(i)
+
+    def *[T](list: List[T]) = {
+      @tailrec
+      def nTimes(n: Int, acc: List[T]): List[T] =
+        if (n <= 1 ) acc
+        else nTimes( n - 1, acc ++ list)
+      nTimes(value, list)
+    }
+  }
+
+  3.times((i) => println("I am awesome!"))
+  println(4 * List("a", "b"))
+
 }
