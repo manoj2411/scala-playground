@@ -48,8 +48,8 @@ object PimpTheLibrary extends App {
 //    def encrypt(cypherDistance: Int) = str.map(x => (x + cypherDistance).toChar)
     def encrypt(cypherDistance: Int) = str.map(x => (x + cypherDistance).asInstanceOf[Char])
   }
-  println("24".asInt * 10)
-  println("John".encrypt(2))
+//  println("24".asInt * 10)
+//  println("John".encrypt(2))
 
   implicit class EnrichingInt(value: Int) {
     def times(f: Int => Unit) =
@@ -64,7 +64,28 @@ object PimpTheLibrary extends App {
     }
   }
 
-  3.times((i) => println("I am awesome!"))
-  println(4 * List("a", "b"))
+//  3.times((i) => println("I am awesome!"))
+//  println(4 * List("a", "b"))
 
+  /* Just in case, can we do? "3" / 4
+      yes, with implicit conversions.
+  */
+  implicit def stringToInt(str: String): Int = Integer.parseInt(str)
+  println("24" / 6 )
+  /* Note: implicit conversion with methods are discouraged.
+
+  Danger zone example: lets say we want to do something like
+    if (n) ....
+  */
+  implicit def intToBool(i: Int): Boolean = i == 1
+
+  println( if (24) "Ok" else "Something is wrong.")
+  // This is discouraged because if there is a bug in implicit method conversion, its very difficult to trace.
+
+  /* TIPS:
+      - Keep type enrichment to implicit classes and type classes
+      - Avoid implicit defs as much as possible.
+      - package implicits clearly, bring them to scope ONLY WHEN YOU NEED, WHAT YOU NEED.
+      - If you need conversions, make them as specific as possible.
+  * */
 }
