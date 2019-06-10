@@ -76,20 +76,6 @@ object TypeClasses extends App {
     def action2(value: T): List[String]
   }
 
-  /* Equality */
-  trait Equal[T] {
-    def apply(x: T, y: T): Boolean
-  }
-
-  // Compare users by name and compare user by both name * email
-  implicit object NameEquality extends Equal[User] {
-    override def apply(x: User, y: User): Boolean = x.name == y.name
-  }
-
-   object FullEquality extends Equal[User] {
-    override def apply(x: User, y: User): Boolean = NameEquality(x, y) && x.email == y.email
-  }
-
   /* PART 2 */
   object HTMLSerializer {
 //    def serialize[T](value: T)(implicit serializer: HTMLSerializer[T]): String = serializer.serialize(value)
@@ -111,14 +97,5 @@ object TypeClasses extends App {
       i.e. not only to the serialize methods but other methods as well.
   */
   HTMLSerializer[User] // here we have access to the entire type class interface
-
-  /* EXERCISE: implement type class pattern for Equality type class */
-  object Equal {
-//    def apply[T](x: T, y: T)(implicit equality: Equal[T]) = equality(x, y)
-    def apply[T](implicit equality: Equal[T]) = equality
-  }
-
-  val bob2 = User("Bob", 24, "bob2@gmail.com")
-  println(Equal[User].apply(bob, bob2))
 
 }
