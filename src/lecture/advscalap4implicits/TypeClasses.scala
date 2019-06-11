@@ -98,4 +98,17 @@ object TypeClasses extends App {
   */
   HTMLSerializer[User] // here we have access to the entire type class interface
 
+  implicit class HTMLEnrichment[T](value: T) {
+    def toHtml(implicit serializer: HTMLSerializer[T]) = serializer.serialize(value)
+  }
+  println(bob.toHtml)
+  // this will be rewritten by complier like println(new HTMLEnrichment[User](bob.toHtml(UserSerializer))
+  // THIS IS COOL!!!
+  println(24.toHtml)
+
+  /* Main elements to enhance existing types with type class:
+      - type classes --- MyTypeClassTemplate or HTMLSerializer[T]
+      - type class instances --- DateSerializer, UserSerializer, IntSerializer
+      - conversion/enrichment with implicit classes --- HTMLEnrichment
+  */
 }
