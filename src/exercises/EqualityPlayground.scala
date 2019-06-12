@@ -10,11 +10,11 @@ object EqualityPlayground extends App {
   }
 
   // Compare users by name and compare user by both name * email
-  implicit object NameEquality extends Equal[User] {
+  object NameEquality extends Equal[User] {
     override def apply(x: User, y: User): Boolean = x.name == y.name
   }
 
-  object FullEquality extends Equal[User] {
+  implicit object FullEquality extends Equal[User] {
     override def apply(x: User, y: User): Boolean = NameEquality(x, y) && x.email == y.email
   }
 
@@ -27,5 +27,25 @@ object EqualityPlayground extends App {
   val bob = User("Bob", 21, "bob@gmail.com")
   val bob2 = User("Bob", 24, "bob2@gmail.com")
   println(Equal[User].apply(bob, bob2))
+
+  /* Exercise: Improve Equal TC with implicit conversion class
+      This conversion class will have 2 methods:
+        1. ===(anotherValue: T)
+        2. !==(anotherValue: T)
+  */
+
+  implicit class EnrichedEqual[T](value: T) {
+    def ===(anotherValue: T)(implicit equality: Equal[T]) =
+      equality(value, anotherValue)
+
+    def !==(anotherValue: T)(implicit equality: Equal[T]) =
+      !(value === anotherValue)
+  }
+
+  println(bob === bob2)
+
+  /* This === is TYPE SAFE, lets see how
+      if we write bob === 24 it'll not compile whereas bob == 24 will return false but NOT TYPE SAFE
+  */
 
 }
