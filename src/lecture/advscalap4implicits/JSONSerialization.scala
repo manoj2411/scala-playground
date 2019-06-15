@@ -16,6 +16,7 @@ object JSONSerialization extends App {
       3. serialize these intermediate data-types to json.
   */
 
+  /*  Step 1   */
   trait JSONValue {
     def stringify: String
   }
@@ -46,4 +47,49 @@ object JSONSerialization extends App {
 
   println(data.stringify)
 
+  /*  Step 2 - create type class and TC instances */
+
+  trait JSONConverter[T] {
+    def convert(value: T): JSONValue
+  }
+
+  object UserConverter extends JSONConverter[User] {
+    def convert(user: User): JSONObject = JSONObject(Map(
+      "name" -> JSONString(user.name),
+      "email" -> JSONString(user.email),
+      "age" -> JSONInt(user.age)
+    ))
+  }
+
+  object PostConverter extends JSONConverter[Post] {
+    override def convert(post: Post): JSONValue = JSONObject(Map(
+      "content" -> JSONString(post.content),
+      "createdAt" -> JSONString(post.createAt.toString)
+    ))
+  }
+
+  implicit object FeedConverter extends JSONConverter[Feed] {
+    def convert(feed: Feed): JSONObject = JSONObject(Map(
+      "user" -> UserConverter.convert(feed.user),
+      "posts" -> JSONArray(feed.posts.map(PostConverter.convert(_)))
+    ))
+  }
+
+  val bob = User("Bob", 24, "bob@gmail.com")
+  val feed = Feed(
+    bob,
+    List(
+      Post("Hey world!", new Date),
+      Post("I love scala!", new Date)
+    )
+  )
+
+  implicit class JSONEnrichment[T](value: T) {
+    def toJson(implicit converter: JSONConverter[T]): JSONValue =
+      converter.convert(value)
+  }
+
+  println(feed.toJson.stringify)
+
+  /*  Step 3 - pimp library to use type class instances */
 }
