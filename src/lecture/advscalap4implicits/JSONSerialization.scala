@@ -48,12 +48,11 @@ object JSONSerialization extends App {
   println(data.stringify)
 
   /*  Step 2 - create type class and TC instances */
-
   trait JSONConverter[T] {
     def convert(value: T): JSONValue
   }
 
-  object UserConverter extends JSONConverter[User] {
+  implicit object UserConverter extends JSONConverter[User] {
     def convert(user: User): JSONObject = JSONObject(Map(
       "name" -> JSONString(user.name),
       "email" -> JSONString(user.email),
@@ -61,7 +60,7 @@ object JSONSerialization extends App {
     ))
   }
 
-  object PostConverter extends JSONConverter[Post] {
+  implicit object PostConverter extends JSONConverter[Post] {
     override def convert(post: Post): JSONValue = JSONObject(Map(
       "content" -> JSONString(post.content),
       "createdAt" -> JSONString(post.createAt.toString)
@@ -70,9 +69,15 @@ object JSONSerialization extends App {
 
   implicit object FeedConverter extends JSONConverter[Feed] {
     def convert(feed: Feed): JSONObject = JSONObject(Map(
-      "user" -> UserConverter.convert(feed.user),
-      "posts" -> JSONArray(feed.posts.map(PostConverter.convert(_)))
+      "user" -> feed.user.toJson,
+      "posts" -> JSONArray(feed.posts.map(_.toJson))
     ))
+  }
+
+  /*  Step 3 - pimp library to use type class instances */
+  implicit class JSONEnrichment[T](value: T) {
+    def toJson(implicit converter: JSONConverter[T]): JSONValue =
+      converter.convert(value)
   }
 
   val bob = User("Bob", 24, "bob@gmail.com")
@@ -84,12 +89,6 @@ object JSONSerialization extends App {
     )
   )
 
-  implicit class JSONEnrichment[T](value: T) {
-    def toJson(implicit converter: JSONConverter[T]): JSONValue =
-      converter.convert(value)
-  }
-
   println(feed.toJson.stringify)
 
-  /*  Step 3 - pimp library to use type class instances */
 }
