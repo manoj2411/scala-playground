@@ -10,7 +10,7 @@ object Exceptions extends App {
   val result = try {
     failFirst(true)
   } catch {
-    case NullPointerException => 0
+    case e: NullPointerException => 0
   } finally {
     "closing"
   }
