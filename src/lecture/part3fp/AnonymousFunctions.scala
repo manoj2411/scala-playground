@@ -14,14 +14,23 @@ object AnonymousFunctions extends App {
   // No params
   val something = () => 24
 
-  // curly braces with lambda
+  /*
+    NOTE:
+      - println(something) VS println(something())
+        - println(something) return an instance of lambda
+        - println(something()) returns correct output
+      - CAREFUL: YOU MUST call lambdas with "()"
+
+  */
+
+  // ANOTHER STYLE: curly braces with lambda (Its not always loved :| but its common)
   val stringToInt = { (str: String) =>
     str.toInt
   }
 
   // MOAR syntactic sugar
   val myIncrementer: Int => Int = (x: Int) => x + 1
-  val myShprtIncrementer: Int => Int = _ + 1
+  val myShortIncrementer: Int => Int = _ + 1
   val shortAdder: (Int, Int) => Int = _ + _ // equivalent to = (a, b) => a + b
 
   /* Exercises
