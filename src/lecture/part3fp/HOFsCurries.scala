@@ -18,7 +18,7 @@ object HOFsCurries extends App {
   // of this fn ntimes which we can then use it for any value we want.
   val incrOne = (x: Int) => x + 1
 
-  def nTimesNew(fn: Int => Int, n: Int): Int => Int =
+  def nTimesNew(fn: Int => Int, n: Int): (Int => Int) =
     if (n <= 0) (x: Int) => x
     else (x: Int) => nTimesNew(fn, n - 1)(fn(x))
 

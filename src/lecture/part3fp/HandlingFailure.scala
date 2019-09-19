@@ -9,7 +9,8 @@ object HandlingFailure extends App {
   println(_failure)
 
   def unsafeFun = throw new RuntimeException("Another failure!")
-  // Try via apply method
+  // Try objects via apply method. The program will not crash here, it'll be success or failure.
+
   val potentialFailure = Try(unsafeFun)
   println(potentialFailure)
   val anotherFailure = Try {
@@ -23,6 +24,13 @@ object HandlingFailure extends App {
   println(_success.map(_ / 2))
   println(_success.flatMap(x => Success(x * 5)))
   println(_success.filter(_ > 100))
+
+
+  // orElse : lets say you have an unsafe api and a backup method for that, you can use orElse
+  def backupMethod = "a valid result"
+  val fallbackTry = Try(unsafeFun).orElse(Try(backupMethod))
+  println(backupMethod)
+
 
   // Exercise
   val host = "localhost"
