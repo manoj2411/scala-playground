@@ -29,9 +29,4 @@ object SynchronisedGuardedBlock extends App {
 
   greeter.join()
 
-
-  def log(msg: String): Unit = {
-    val currTime = Calendar.getInstance().getTime()
-    println(s"[${currTime}]: $msg")
-  }
 }

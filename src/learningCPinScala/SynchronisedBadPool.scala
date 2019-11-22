@@ -1,7 +1,6 @@
 package learningCPinScala
 
 import scala.collection.mutable
-import SynchronisedGuardedBlock.log
 
 object SynchronisedBadPool extends App {
   type Task = () => Unit

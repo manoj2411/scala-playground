@@ -3,10 +3,8 @@ package learningCPinScala
 import java.util.concurrent.atomic.AtomicBoolean
 
 import scala.concurrent.ExecutionContext
-import SynchronisedGuardedBlock.log
 
 object AtomicLock extends App {
-  import Commons._
 
   private val lock = new AtomicBoolean(false)
 
@@ -23,12 +21,4 @@ object AtomicLock extends App {
   Thread.sleep(1000)
 
   log(s"count is : $count")
-}
-
-object Commons {
-  def execute(body: => Unit) {
-    ExecutionContext.global.execute(
-      new Runnable { def run() = body }
-    )
-  }
 }
