@@ -2,6 +2,7 @@ package lecture.advscalap1
 
 import scala.util.Try
 
+// 01
 object DarkSugars extends App {
     // 1. Methods with single param: We can call single ARG method with curly braces instead of calling method with a argument in parentheses.
 

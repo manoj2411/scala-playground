@@ -1,5 +1,6 @@
 package lecture.advscalap1
 
+// 02
 object AdvancedPatternMatching extends App {
 
   val numbers = List(24)
