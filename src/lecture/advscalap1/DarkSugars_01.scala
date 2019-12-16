@@ -3,7 +3,7 @@ package lecture.advscalap1
 import scala.util.Try
 
 // 01
-object DarkSugars extends App {
+object DarkSugars_01 extends App {
     // 1. Methods with single param: We can call single ARG method with curly braces instead of calling method with a argument in parentheses.
 
     val tryInstance = Try {
@@ -23,15 +23,19 @@ object DarkSugars extends App {
     }
     val funkyInstance: Action = (x: Int) => x * 10
     // This pattern also works for classes that have some methods implemented but only have one method unimplemented
+    // another example: Runnable
+    val aThread = new Thread(new Runnable {
+        override def run(): Unit = println("inside a thread!") // Only unimplemented method
+    }) // This is Java way
+    val anotherThread = new Thread(() => println("another thread!")) // This is Scala way
 
-
-    // 3. :: & #:: methods:
+    // 3. :: & #:: methods are special bcz ends with colan(:)
     val prependedList = 2 :: List(8, 6) // => List(8, 6).::(2) .
     // Scala spec: last character decides associativity of the method. Ex: method ends with : will be right associative
     class MyStream[T] {
       def -->:(value: T): MyStream[T] = this
     }
-    val myStream = 1 -->: 2 -->: 4-->: new MyStream[Int]
+    val myStream = 1 -->: 2 -->: 4-->: new MyStream[Int] // The -->: operator here is right associative, ends with :
 
 
     // 4. Multi word method naming.

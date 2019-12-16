@@ -1,7 +1,7 @@
 package lecture.advscalap1
 
 // 02
-object AdvancedPatternMatching extends App {
+object AdvancedPatternMatching_02 extends App {
 
   val numbers = List(24)
   numbers match {
@@ -86,7 +86,7 @@ object AdvancedPatternMatching extends App {
   }
   println(decomposed)
 
-  // Custom return types for unapply: The DS we want to retunr only needs to have 2 methods:
+  // Custom return types for unapply: The DS we want to return only needs to have 2 methods:
   // isEmpty: Boolean, get: something
 
 }
