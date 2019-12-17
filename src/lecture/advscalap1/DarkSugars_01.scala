@@ -59,17 +59,17 @@ object DarkSugars_01 extends App {
 
     // 6. update() is a very special method, much like apply()
     val anArray = Array(2,4,5)
-    anArray(2) = 8 // => anArray.update(2, 8)
-    // Used in mutable collections. REMEMBER: Its special like apply()
+    anArray(2) = 8 // rewritten to anArray.update(2, 8)
+    // Used a lot in mutable collections. If writing your own mutable container then consider providing update method
+    // REMEMBER: Its special like apply()
 
     // 7. Setters for mutable containers
     class MyMutable {
       private var myMember = 0
       def member = myMember // getter
-      def member_=(value: Int) =
-        myMember = value // setter
+      def member_=(value: Int): Unit = myMember = value // setter
     }
     val myMutable = new MyMutable
-    myMutable.member = 10 // => myMutable.member_=(10)
+    myMutable.member = 10 // rewritten as myMutable.member_=(10) by compiler, only happens if we have both getter & setter "member"
 }
 
