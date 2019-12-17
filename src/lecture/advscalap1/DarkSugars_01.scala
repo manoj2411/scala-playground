@@ -46,10 +46,14 @@ object DarkSugars_01 extends App {
     lilly `and then said` "Scala is awesome"
 
 
-    // 5. Infix types
-    class Composite[A, B]
+    // 5. Infix generic types
+    class Composite[A, B] // This is similar to Map, has 2 (generic) types
+      // Normal way
+    val compositeUsual: Composite[Int, String] = ???
+      // Infix way
     val composite: Int Composite String = ???
 
+      // Similarly
     class -->[A, B]
     val towards: Int --> String = ???
 
