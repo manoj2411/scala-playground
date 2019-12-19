@@ -1,6 +1,7 @@
 package lecture.advscalap1
 
-// 02
+// 02 - This section is mostly about how can you make your own created classes, collection compatible with Pattern Matching
+//      and the key methods for this are unapply and unapplySeq
 object AdvancedPatternMatching_02 extends App {
 
   val numbers = List(24)
@@ -10,7 +11,7 @@ object AdvancedPatternMatching_02 extends App {
   }
 
   /* How make our own structures compatible with PM. 99% standard PM will be enough.
-    - just create an companion object and define method `unapply` and return tuple
+      - just create an companion object and define method `unapply` and return tuple
   */
   class Person(val name: String, val age: Int)
   object Person {
@@ -22,6 +23,7 @@ object AdvancedPatternMatching_02 extends App {
   }
   val tom = new Person("Tom", 35)
   tom match {
+    // In this case, Person.unapply is being called simply and its returned values are fed to the args.
     case Person(n, a) => println(s"Hey, I am $n and I am $a years old!")
     case _ => println("None")
   }
@@ -41,10 +43,10 @@ object AdvancedPatternMatching_02 extends App {
   }
 
   object isEven {
-    def unapply(number: Int) = number % 2 == 0
+    def unapply(number: Int): Boolean = number % 2 == 0
   }
   object isSingleDigit {
-    def unapply(number: Int) = number < 10
+    def unapply(number: Int): Boolean = number < 10
   }
 
   val newMathProp = n match {
@@ -55,6 +57,7 @@ object AdvancedPatternMatching_02 extends App {
   println(newMathProp)
   // A quick way to write tests for pattern matching is to define Singleton object with unapply which returns Boolean.
   // The advantage of this approach is that you can reuse these boolean and tests in other pattern matches
+
   // ===================================================
 
   // Infix patterns, it'll work only when you 2 things in pattern.
@@ -66,8 +69,21 @@ object AdvancedPatternMatching_02 extends App {
     case number Or string => s"$number is written as $string"
   }
   println(desc)
+  // Similarly this can be written as
+  case class ||[A, B](a: A, b: B)
+  val myOr = ||(4, "Four")
+  val myResult = myOr match {
+    // case ||(number, string) => s"$number is written as $string"
+    // ==
+    case number || string => s"$number is written as $string"
+    // similarly case head :: Nil, :: is the infix pattern here.
+  }
+  println(myResult)
 
-  // Decomposing sequences
+  // ===================================================
+
+  // Decomposing sequences - This is useful when you are building your own Collection and want to use it with
+  //   match { case MyList(2,4,_*) ... }
   abstract class MyList[+A] {
     def head: A = ???
     def tail: MyList[A] = ???
@@ -86,7 +102,29 @@ object AdvancedPatternMatching_02 extends App {
   }
   println(decomposed)
 
-  // Custom return types for unapply: The DS we want to return only needs to have 2 methods:
-  // isEmpty: Boolean, get: something
+  // ===================================================
+
+  // Custom return types for unapply:
+  // The DataStructure we want to return only needs to have 2 methods:
+  //  isEmpty: Boolean, get: something
+
+  trait Wrapper[T] {
+    def isEmpty: Boolean
+    def get: T
+  }
+
+  object PersonWrapper {
+    def unapply(person: Person): Wrapper[String] = new Wrapper[String] {
+      override def isEmpty: Boolean = false
+      override def get: String = person.name
+    }
+  }
+
+  val person = new Person("Modi", 42)
+
+  val name = person match {
+    case PersonWrapper(personName) => s"Hey, this is $personName"
+  }
+  println(name)
 
 }
