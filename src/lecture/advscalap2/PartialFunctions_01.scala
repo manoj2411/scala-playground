@@ -1,6 +1,8 @@
 package lecture.advscalap2
 
-object PartialFunctions extends App {
+import scala.io.Source
+
+object PartialFunctions_01 extends App {
   val aFunction = (x: Int) => x * 10
   // Sometimes you may want some functions that only accept certain values, we want our function to not accept any other values other than 1, 2 & 5.
   // Possible solutions: Add if, else if conditions OR add cases using PM.
@@ -29,6 +31,8 @@ object PartialFunctions extends App {
   aPartialFn.orElse[Int, Int] {
     case 24 => 1
   }
+
+  // Partial Functions are subtype of total functions - PF extends normal function, that why...(next line)
   // HOFs excepts PFs as well
   val aMappedList = List(2,4,5).map {
     case 2 => 20
@@ -38,5 +42,14 @@ object PartialFunctions extends App {
   println(aMappedList)
 
   // Note: Unlike functions which can have multiple parameters a partial fn can only have one parameter type
+
+  /* Exercise
+      1. A small dumb chatbot as PF
+  * */
+  val smallChatbot : PartialFunction[String, String] = {
+    case "hi" => "Hey there, how can I help you?"
+    case "bye" => "Why, there is no way to out, hahaha..."
+  }
+  scala.io.Source.stdin.getLines.map(smallChatbot).foreach(println)
 
 }
