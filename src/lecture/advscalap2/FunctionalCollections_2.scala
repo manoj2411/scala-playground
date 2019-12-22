@@ -18,6 +18,7 @@ object FunctionalCollections_2 extends App {
   println(1 to 12 map { _ => randChar(4) })
 
   trait MySet[A] extends (A => Boolean) {
+    override def apply(v1: A): Boolean = contains(v1)
     def contains(i: A): Boolean
     def +(i: A): MySet[A]
     def ++(anotherMySet: MySet[A]): MySet[A]
@@ -28,4 +29,34 @@ object FunctionalCollections_2 extends App {
     def foreach(fn: A => Unit): Unit
   }
   // Small exercise to implement this MySet trait.
+  class EmptyMySet[A] extends MySet[A] {
+    def contains(i: A): Boolean = false
+    def +(i: A): MySet[A] = new MySetImpl(i, this)
+    def ++(anotherMySet: MySet[A]): MySet[A] = anotherMySet
+
+    def map[B](fn: A => B): MySet[B] = new EmptyMySet[B]
+    def flatMap[B](fn: A => MySet[B]): MySet[B] = new EmptyMySet[B]
+    def filter(predicate: A => Boolean): MySet[A] = this
+    def foreach(fn: A => Unit): Unit = ()
+  }
+
+  class MySetImpl[A](head: A, tail: MySet[A] = new EmptyMySet[A]) extends MySet[A] {
+    def contains(i: A): Boolean = i == head || tail.contains(i)
+    def +(i: A): MySet[A] = if (this(i)) this else new MySetImpl(i, this)
+
+    def ++(anotherMySet: MySet[A]): MySet[A] = tail ++ anotherMySet + head
+
+    def map[B](fn: A => B): MySet[B] = (tail map fn) + fn(head)
+    def flatMap[B](fn: A => MySet[B]): MySet[B] =  tail.flatMap(fn) ++ fn(head)
+    def filter(predicate: A => Boolean): MySet[A] =
+      if (predicate(head)) (tail filter predicate) + head
+      else tail filter predicate
+
+    def foreach(fn: A => Unit): Unit = {
+      fn(head)
+      tail foreach fn
+    }
+  }
+  val set1 = new EmptyMySet[Int] + 1 + 2 + 1 ++ new MySetImpl[Int](3) ++ new MySetImpl[Int](2)
+  set1 flatMap(x => new MySetImpl[Int](x) + x * 10 ) filter(_ % 2 == 0) foreach println
 }
