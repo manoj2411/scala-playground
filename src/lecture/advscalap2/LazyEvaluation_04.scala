@@ -1,27 +1,25 @@
 package lecture.advscalap2
 
-object LazyEvaluation extends App {
+object LazyEvaluation_04 extends App {
   // lazy value are evaluated once but only when they are used for the 1st time.
   // Its DELAYS the evaluation of values
   lazy val exc: Int = throw new RuntimeException
 
   // Examples of implications:
-  // Side effects
+  //  1. Side effects
   def sideEffectCondn: Boolean = {
     println("Bool")
     true
   }
   def simpleCondn = false
-
   // Be very careful if you use lazy values and have side effects in your program.
   lazy val lazyCondn = sideEffectCondn
-//  println(if (simpleCondn && lazyCondn) "Yes" else "No") // It'll not print "Bool"
+  //  println(if (simpleCondn && lazyCondn) "Yes" else "No") // It'll not print "Bool"
 
-  // in conjunction with call by name. Common bug
+  //  2. in conjunction with call by name. Common bug
   def byNameMethod(n: => Int): Int = {
     // n + n + n // It'll do long processing 3 times
-
-    lazy val tmp = n // CALL BY NEED
+    lazy val tmp = n // only evaluated once - CALL BY NEED
     tmp + tmp + tmp
   }
   def retrieveProcessing: Int = {
@@ -32,6 +30,7 @@ object LazyEvaluation extends App {
   }
   // println("[byNameMethod]: " + byNameMethod(retrieveProcessing))
 
+  /*   3. Filtering with lazy vals : withFilter   */
   def lessThan30(n: Int): Boolean = {
     println(s"$n is less than 30?")
     n < 30
@@ -47,7 +46,7 @@ object LazyEvaluation extends App {
   //println(gt20)
   //println()
 
-  // lazy filtering
+  // lazy filtering : withFilter - doesn’t do any work, until values are pulled from the collection.
   val lazyLt30 = numbers.withFilter(lessThan30) // lazy vals under the hood
   val lazyGt20 = lazyLt30.withFilter(greaterThan20)
   //println(lazyGt20) // it'll not trigger evaluation

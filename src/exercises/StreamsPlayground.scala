@@ -45,7 +45,7 @@ object EmptyStream extends MyStream[Nothing] {
   def filter(predicate: Nothing => Boolean): MyStream[Nothing] = this
 
   def take(n: Int): MyStream[Nothing] = this
-  // def takeAsList(n: Int): List[Nothing] = Nil // Nil– Represents an emptry List of anything of zero length
+  // def takeAsList(n: Int): List[Nothing] = Nil // Nil– Represents an empty List of anything of zero length
 }
 
 // _tail "call by name" is required to make it lazy
