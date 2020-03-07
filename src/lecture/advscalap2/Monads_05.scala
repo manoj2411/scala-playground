@@ -1,6 +1,6 @@
 package lecture.advscalap2
 
-object Monads extends App {
+object Monads_05 extends App {
 
   // a custom Try monad implementation
   trait Attempt[+A] {
@@ -67,9 +67,25 @@ object Monads extends App {
   2. Monads = unit + flatMap === unit + map + flatten
     Monad[T] {
       def flatMap[B](fn: A => Monad[B]): Monad[B] // assume its implemented.
-      def map[B](fn: A => B): Monad[B] = flatMap( x => apply(f(x)))
-      def flatten(monad: Monad[Monad[A]]): Monad[A] = monad.flatMap()
+      def map[B](fn: A => B): Monad[B] = flatMap( x => ???
+      def flatten(monad: Monad[Monad[A]]): Monad[A] = ???
     }
     Think it as a List
+
+    map & flatten can be defined in terms of flatMap and its tru for all monads
+      def map[B](fn: A => B): Monad[B] = flatMap( x => apply(f(x)))
+      def flatten(monad: Monad[Monad[A]]): Monad[A] = monad.flatMap()
+
+   Example:
   */
+  /*  Flattening using flatMap   */
+  //  val s1: Option[Option[Int]] = Some(Some(24))
+  //  println(s1)
+  //  println(s1.flatMap(x => x))
+
+  /*  Mapping using flatMap   */
+  val fn: Int => Int = x => x * 10
+  val s1: Option[Int] = Some(24)
+  println(s1.flatMap(x => Some(fn(x))))
+
 }
