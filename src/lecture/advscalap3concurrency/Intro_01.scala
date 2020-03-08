@@ -2,8 +2,8 @@ package lecture.advscalap3concurrency
 
 import java.util.concurrent.Executors
 
-object Intro extends App {
-
+object Intro_01 extends App {
+  /*  This is mostly about Java or JVM threads    */
   val runnable = new Runnable {
     override def run(): Unit = println("Inside runnable!")
   }
@@ -48,18 +48,21 @@ object Intro extends App {
     //println(s"My acount is now $account")
   }
 
-//  for (i <- (1 to 2000)) {
-//    val account = new BankAccount(5000)
-//    val thread1 = new Thread(() => buy(account, "shoes", 2000))
-//    val thread2 = new Thread(() => buy(account, "tShirt", 1000))
-//    thread1.start
-//    thread2.start
-//
-//    Thread.sleep(10)
-//    if (account.amount != 2000 ) println(s"Dispute: ${account}")
-//  }
-  // Solution #1 to race condition:
-  //  use synchronised() to solve concurrency problem (option1)
+  //  for (i <- (1 to 2000)) {
+  //    val account = new BankAccount(5000)
+  //    val thread1 = new Thread(() => buy(account, "shoes", 2000))
+  //    val thread2 = new Thread(() => buy(account, "tShirt", 1000))
+  //    thread1.start
+  //    thread2.start
+  //
+  //    Thread.sleep(10)
+  //    if (account.amount != 2000 ) println(s"Dispute: ${account}")
+  //  }
+
+  /*    Solution #1 to race condition:
+          - use synchronised() to solve concurrency problem (option1)
+          - synchronised() method is availbe only on Reference types
+  */
   def safeBuy(account: BankAccount, thing: String, price: Int) = {
     account.synchronized {
       // with synchronized method, no 2 threads can evaluate this expression at the same time.
