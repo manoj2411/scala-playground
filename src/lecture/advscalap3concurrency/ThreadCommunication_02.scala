@@ -1,5 +1,7 @@
 package lecture.advscalap3concurrency
 
+import scala.collection.mutable
+
 object ThreadCommunication_02 extends App {
 
   /*   Producer Consumer Problem
@@ -64,7 +66,45 @@ object ThreadCommunication_02 extends App {
     producer.start()
     consumer.start()
   }
+  //  smartProducerConsumer
 
-  smartProducerConsumer
+  /*    Extend producer-consumer from a single value container to Buffer or values
+          - buffer with limited size
+          producer -> [ ? ? ? ] -> consumer
+  * */
 
+  def bufferedProducerConsumer: Unit = {
+    val buffer = mutable.Queue[Int]()
+
+    val producer = new Thread(() => {
+      (1 to 10).foreach { i =>
+        buffer.synchronized {
+          if (buffer.size == 3) {
+            buffer.wait()
+          }
+          println(s"[producer] setting value .. $i")
+          buffer.enqueue(i)
+          buffer.notify()
+        }
+      }
+    })
+
+    val consumer = new Thread(() => {
+      (0 to 15).foreach { _ =>
+        buffer.synchronized {
+          if (buffer.isEmpty) {
+            buffer.wait()
+          }
+          // Gets control after notifying
+          println(s"[consumer] consuming ${buffer.dequeue()}")
+          buffer.notify()
+        }
+      }
+    })
+
+    producer.start()
+    consumer.start()
+  }
+
+  bufferedProducerConsumer
 }
