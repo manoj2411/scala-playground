@@ -1,6 +1,7 @@
 package lecture.advscalap3concurrency
 
 import scala.collection.mutable
+import scala.util.Random
 
 object ThreadCommunication_02 extends App {
 
@@ -106,5 +107,51 @@ object ThreadCommunication_02 extends App {
     consumer.start()
   }
 
-  bufferedProducerConsumer
+  //  bufferedProducerConsumer
+
+  // extend this solution to multiple consumers(different threads) and producers working on same buffer
+  class Consumer(id: Int, buffer: mutable.Queue[Int]) extends Thread {
+    val random = new Random()
+
+    override def run(): Unit = while(true) {
+        Thread.sleep(random.nextInt(250))
+        buffer.synchronized {
+          while (buffer.isEmpty) {
+            println(s"[consumer $id] Buffer EMPTY, waiting ...")
+            buffer.wait()
+          }
+          println(s"[consumer $id] processing ${buffer.dequeue}")
+          buffer.notify()
+        }
+      }
+  }
+  var i = 0
+  class Producer(id: Int, buffer: mutable.Queue[Int], capacity: Int = 5) extends Thread {
+    val random = new Random()
+
+    override def run(): Unit = while(true) {
+        Thread.sleep(random.nextInt(200))
+        buffer.synchronized {
+          while (buffer.size >= capacity) {
+            println(s"[producer $id] Buffer FULL(${buffer.length}), waiting ...")
+            buffer.wait()
+          }
+          println(s"[producer $id] putting value - $i")
+          buffer.enqueue(i)
+          i += 1
+          buffer.notify()
+        }
+    }
+  }
+
+  def multiProducersConsumers(maxConsumers: Int = 1, maxProducers: Int = 1): Unit = {
+    val buffer = new mutable.Queue[Int]
+    val customers = (1 to maxConsumers).map{ i => new Consumer(i, buffer) }
+    val producers = (1 to maxProducers).map{ i => new Producer(i, buffer) }
+
+    producers.foreach(_.start())
+    customers.foreach(_.start())
+  }
+  multiProducersConsumers(4,2)
+
 }
