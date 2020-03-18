@@ -1,6 +1,6 @@
 package lecture.advscalap3concurrency
 
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future, Promise}
 import scala.util.{Failure, Random, Success}
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -81,6 +81,43 @@ object FuturesAndPromises_03 extends App {
   val cFallbackProfile: Future[Profile] = SocialNetwork.fetchProfile("fb.id.1.a").fallbackTo {
       SocialNetwork.fetchProfile("fb.id.0.d") // recoverWith Returns Future[Profile] here, not future. Its like flatMap
   }
-
   Thread.sleep(2000)
+
+  /*    Block on Future and control them using Promise pattern    */
+  // sample banking App
+
+  case class User(name: String)
+  case class Transaction(sender: String, receiver: String, amount: Double, status: String)
+  import scala.concurrent.duration._
+  object MyBankingApp {
+    val name = "MyBankingApp"
+
+    def fetchUser(name: String): Future[User] = Future {
+      // simulating DB
+      Thread.sleep(300)
+      User(name)
+    }
+
+    def createTransaction(user: User, merchantName: String, amount: Double): Future[Transaction] = Future {
+      // some process and checks on merchant
+      Thread.sleep(700)
+      Transaction(user.name, merchantName, amount, "Success")
+    }
+
+    def purchage(userName: String, item: String, merchantName: String, amount: Double): String = {
+      // here we need resolve future and block
+      // fetch user, validate and check balance
+      // create transaction and wait for Transaction to finish
+      val transactionF = for {
+        user <- fetchUser(userName)
+        transaction <- createTransaction(user, merchantName, amount)
+      } yield transaction.status
+
+      Await.result(transactionF, 2 second)
+    }
+  }
+  val purchaseResponse = MyBankingApp.purchage("Manoj", "a Book", "Safari", 10)
+  // println("Purchase status - " + purchaseResponse)
+
+
 }
