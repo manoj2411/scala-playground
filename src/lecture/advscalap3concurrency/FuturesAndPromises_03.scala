@@ -119,5 +119,24 @@ object FuturesAndPromises_03 extends App {
   val purchaseResponse = MyBankingApp.purchage("Manoj", "a Book", "Safari", 10)
   // println("Purchase status - " + purchaseResponse)
 
+  /*    Promise - A way to manage future
+  *       - separates the reading part of Future from Writing part
+  */
 
+  val promise = Promise[Int]()
+  val future = promise.future
+  // reading part
+  future.onComplete {
+    case Success(n) => println(s"[consumer] consuming $n")
+  }
+
+  // writing part
+  val producer = new Thread(() => {
+    println("[producer] processing heavy things ...")
+    Thread.sleep(2000)
+    println("[producer] pushing value  ...")
+    promise.success(24)
+  })
+
+  producer.start()
 }
