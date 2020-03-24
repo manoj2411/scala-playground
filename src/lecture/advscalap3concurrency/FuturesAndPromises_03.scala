@@ -1,7 +1,7 @@
 package lecture.advscalap3concurrency
 
 import scala.concurrent.{Await, Future, Promise}
-import scala.util.{Failure, Random, Success}
+import scala.util.{Failure, Random, Success, Try}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 object FuturesAndPromises_03 extends App {
@@ -137,6 +137,66 @@ object FuturesAndPromises_03 extends App {
     println("[producer] pushing value  ...")
     promise.success(24)
   })
+  //  producer.start()
 
-  producer.start()
+  /*    Exercises
+        1. first(fa, fb) => new future with first of 2 futures
+        2. last(fa, fb) => new future with last value of 2 futures
+        3. retryUntil[T](action: () => Future[T], condition: T => Boolean): Future[T]
+          - Run the action, when it completes check the condition if not met then retry action again
+  */
+  val random = new Random()
+  val aF = Future {
+//    Thread.sleep(random.nextInt(500))
+    println("A : waking up")
+    "from A"
+  }
+  val bF = Future {
+//    Thread.sleep(random.nextInt(500))
+    println("B : waking up")
+    "from b"
+  }
+
+  /*    Solution for 1    */
+  def first[A](aFuture: Future[A], bFuture: Future[A]): Future[A] = {
+    val promise = Promise[A]()
+    aFuture.onComplete(promise.tryComplete)
+    bFuture.onComplete(promise.tryComplete)
+    promise.future
+  }
+  first(aF, bF).foreach(x => println("first: " + x))
+
+  /*    Solution for 2    */
+  def last[A](aFuture: Future[A], bFuture: Future[A]): Future[A] = {
+    val firstPromise = Promise[A]()
+    val lastPromise = Promise[A]()
+    val setFirstAndLast = (result: Try[A]) => {
+      if (!firstPromise.tryComplete(result)) lastPromise.tryComplete(result)
+    }
+    aFuture.onComplete(setFirstAndLast)
+    bFuture.onComplete(setFirstAndLast)
+    lastPromise.future
+  }
+  last(aF, bF).foreach(x => println("last: " + x))
+
+  /*    Solution for 3    */
+  def retryUntil[T](action: () => Future[T], condition: T => Boolean): Future[T] = {
+    action()
+      .filter(condition)
+      .recoverWith {
+        case _ =>
+          retryUntil(action, condition)
+      }
+  }
+
+  val getANumber = () => Future[Int] {
+    Thread.sleep(30)
+    val nextNumber = random.nextInt(100)
+    println("Generating number " + nextNumber)
+    nextNumber
+  }
+  retryUntil[Int](getANumber, (x: Int) => x % 10 == 0)
+    .foreach(println)
+
+  Thread.sleep(2000)
 }
