@@ -1,9 +1,8 @@
 package lecture.advscalap4implicits
 
-object OrganisingImplicits extends App {
-  // We'll focus on how compiler looks for implicits and where, and its priorities
-  // ex: sort method - when we don't define anything it picks up form scala.Predef
-  //      and when we define more than 1 implicit ordering for Int it gives error.
+object OrganisingImplicits_02 extends App {
+  /*      How compiler looks for implicits and where, and its priorities   */
+
   implicit val decrOrdering: Ordering[Int] = Ordering.fromLessThan(_ > _ )
 //  print(List(2,4,1,5,3).sorted) // takes implicit ordering form scala.Predef
 
@@ -19,17 +18,12 @@ object OrganisingImplicits extends App {
 
   // Exercise
   case class Person(name: String, age: Int)
-  val people = List (
-    Person("Tom", 24),
-    Person("Dik", 32),
-    Person("Harry", 42)
-  )
+  val people = List (Person("Tom", 24), Person("Don", 32), Person("Harry", 42))
   object Person {
     implicit val peopleByName: Ordering[Person] = Ordering
       .fromLessThan((x, y) => x.name.compareTo(y.name) < 0)
   }
-
-//  println(people.sorted) // if we dont define any implicit ordering it'll fail: No implicit Ordering defined error.
+  //  println(people.sorted) // FAILING : we didn't defined any implicit ordering Person
 
   /* Implicit scope: places where compiler searches for implicit values
       - Local scope
@@ -55,7 +49,7 @@ object OrganisingImplicits extends App {
   }
 
   import AgeOrdering._
-//  println(people.sorted)
+  //  println(people.sorted)
 
   /*
     Exercise: define orderings
