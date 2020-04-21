@@ -2,32 +2,30 @@ package lecture.advscalap4implicits
 
 import java.util.Date
 
-object TypeClasses extends App {
-  /*
-  - a type class is a trait that takes a type and describes what operations can be applied to that type.
-  */
-  // Ex: we have a trait
-  trait HTMLWritable {
+object TypeClasses_03 extends App {
+
+  /*    type class &  type class instances - ye kya bala hai, use kaha kerna hai?   */
+  //    Lets say we have a common functionality that we want to add to many classes, example this :
+  trait HTMLWritableOld {
     def toHTML: String
   }
 
-  case class User(name: String, age: Int, email: String) extends HTMLWritable {
+  case class User(name: String, age: Int, email: String) extends HTMLWritableOld {
     override def toHTML: String = s"<div>$name ($age yo) <a href=$email /> </div>"
   }
   User("Bob", 21, "bob@gmail.com").toHTML
+
   /* The code above will work but it has 2 disadvantages:
   1. This only works with the types we write.
     - Other types like java standard Date, we need to conversion which is not elegant
   2. Only one implementation.
     - if we want to have different implementation for user who is not logged in.
-
   Another solution is Pattern Matching. ex:
   */
-
   object HTMLSerializerPM {
     def serializeHTML(value: Any) = value match {
       case User(n, a, e) =>
-//      case Date =>
+      //      case Date =>
       case _ =>
     }
   }
@@ -39,6 +37,21 @@ object TypeClasses extends App {
 
   Let see a better design
   */
+  // But we want to add it to classes like String, DateTime etc jo humne ne likhi.
+  // We can make it parametrised with generics
+  /*
+        trait HTMLWritable[T] {
+          def toHtml(value: T): String
+        }
+
+        class DateWritable extends HTMLWritable[Date] {
+          override def toHtml(value: Date): String = value.toString
+        }
+  * */
+  trait HTMLWritable[T] {
+    def toHtml(value: T): String
+  }
+
   trait HTMLSerializer[T] {
     def serialize(value: T): String
     def foo = "bar"
@@ -56,6 +69,15 @@ object TypeClasses extends App {
   1. we can define serializers for other types
     - even the type we have't written, from some library, ex:
   2. We can define multiple serializers for a type
+
+      1. we can define for existing types like Date, String, etc
+      2. can define multple implementations, ex, 1 for VisitorUser and 1 for LoggedInUser
+      3. we have type safety in place
+
+    This is "type class", it specifies a set of operations that can be applied to a given type
+      - all the implementors of this class is called "type class instances". often these implementors scala object (singletons)
+    My View - very cool way to organise your code  and common functionality into your code. AMAZING
+
   */
 
   object DateSerializer extends HTMLSerializer[Date] {
@@ -75,6 +97,9 @@ object TypeClasses extends App {
     def action1(value: T): String
     def action2(value: T): List[String]
   }
+
+  /* ================================================================================================================ */
+
 
   /* PART 2 */
   object HTMLSerializer {

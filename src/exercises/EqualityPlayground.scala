@@ -1,6 +1,6 @@
 package exercises
 
-import lecture.advscalap4implicits.TypeClasses.User
+import lecture.advscalap4implicits.TypeClasses_03.User
 
 object EqualityPlayground extends App {
 
