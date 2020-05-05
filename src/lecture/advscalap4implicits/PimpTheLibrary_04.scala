@@ -2,7 +2,7 @@ package lecture.advscalap4implicits
 
 import scala.annotation.tailrec
 
-object PimpTheLibrary extends App {
+object PimpTheLibrary_04 extends App {
 
   /* type enrichment === pimping
       2.isEven : how can we do it?

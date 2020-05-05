@@ -16,11 +16,12 @@ object TypeClasses_03 extends App {
   User("Bob", 21, "bob@gmail.com").toHTML
 
   /* The code above will work but it has 2 disadvantages:
-  1. This only works with the types we write.
-    - Other types like java standard Date, we need to conversion which is not elegant
-  2. Only one implementation.
-    - if we want to have different implementation for user who is not logged in.
-  Another solution is Pattern Matching. ex:
+      1. This only works with the types we write.
+          - Other types like java standard Date, we need to conversion which is not elegant
+      2. Only one implementation.
+          - if we want to have different implementation for user who is not logged in.
+
+    Another solution is PM(Pattern Matching) ex:
   */
   object HTMLSerializerPM {
     def serializeHTML(value: Any) = value match {
@@ -29,25 +30,25 @@ object TypeClasses_03 extends App {
       case _ =>
     }
   }
-  /* Problems with this:
-  1. We lost type safety
-  2. Need code modification every time
-  3. Still 1 implementation with each given type
-  Still not a good design
+  /*    Problems with this:
+        1. We lost type safety
+        2. Need code modification every time
+        3. Still 1 implementation with each given type
 
-  Let see a better design
+        Still not a good design
+          - But we want to add it to classes like String, DateTime etc jo humne ne likhi.
+
+        Let see a BETTER DESIGN
+          We can make it parametrised with generics:
+
+            trait HTMLWritable[T] {
+              def toHtml(value: T): String
+            }
+
+            class DateWritable extends HTMLWritable[Date] {
+              override def toHtml(value: Date): String = value.toString
+            }
   */
-  // But we want to add it to classes like String, DateTime etc jo humne ne likhi.
-  // We can make it parametrised with generics
-  /*
-        trait HTMLWritable[T] {
-          def toHtml(value: T): String
-        }
-
-        class DateWritable extends HTMLWritable[Date] {
-          override def toHtml(value: Date): String = value.toString
-        }
-  * */
   trait HTMLWritable[T] {
     def toHtml(value: T): String
   }
@@ -56,28 +57,27 @@ object TypeClasses_03 extends App {
     def serialize(value: T): String
     def foo = "bar"
   }
-  // Now add a serializer for User
 
-  implicit object UserSerializer extends HTMLSerializer[User] {
+  // Now add a serializer for User
+  implicit object UserSerializer extends HTMLSerializer[User] { // TYPE CLASS INSTANCE
     override def serialize(user: User): String =
       s"<div>${user.name} (${user.age} yo) <a href=${user.email} /> </div>"
   }
   val bob = User("Bob", 21, "bob@gmail.com")
-//  println(UserSerializer.serialize(bob))
+  //  println(UserSerializer.serialize(bob))
 
-  /* What is good in this design?
-  1. we can define serializers for other types
-    - even the type we have't written, from some library, ex:
-  2. We can define multiple serializers for a type
+  /*        What is good in this design?
 
-      1. we can define for existing types like Date, String, etc
-      2. can define multple implementations, ex, 1 for VisitorUser and 1 for LoggedInUser
-      3. we have type safety in place
+        1. we can define serializers for other types
+            - even the type we have't written, from some library, ex:
+        2. We can define multiple serializers for a type
+            1. we can define for existing types like Date, String, etc
+            2. can define multple implementations, ex, 1 for VisitorUser and 1 for LoggedInUser
+            3. we have type safety in place
 
-    This is "type class", it specifies a set of operations that can be applied to a given type
-      - all the implementors of this class is called "type class instances". often these implementors scala object (singletons)
-    My View - very cool way to organise your code  and common functionality into your code. AMAZING
-
+      This is "type class", it specifies a set of operations that can be applied to a given type
+          - all the implementors of this class is called "type class instances". often these implementors scala object (singletons)
+      My View - very cool way to organise your code  and common functionality into your code. AMAZING
   */
 
   object DateSerializer extends HTMLSerializer[Date] {
@@ -87,12 +87,12 @@ object TypeClasses_03 extends App {
   object NotLoggedInUserSerializer extends HTMLSerializer[User] {
     override def serialize(user: User): String = s"<div>${user.name}</div>"
   }
-  /* This HTMLSerializer things is called TYPE CLASS
-  - a type class specifies a set of operations that can be applied to a given type
-  - Implementors of type class are called type class instances which are singleton objects mostly
+  /*    TYPE CLASS
+          - a type class specifies a set of operations that can be applied to a given type
+          - Implementors of type class are called type class instances which are singleton objects mostly
   */
 
-  // A typical type class template: always have a type param, have some actions that returns something.
+  // A typical type class template: always have a **type param**, have some actions that returns something.
   trait MyTypeClassTemplate[T] {
     def action1(value: T): String
     def action2(value: T): List[String]
@@ -100,42 +100,50 @@ object TypeClasses_03 extends App {
 
   /* ================================================================================================================ */
 
-
-  /* PART 2 */
+  /*      PART 2      */
   object HTMLSerializer {
-//    def serialize[T](value: T)(implicit serializer: HTMLSerializer[T]): String = serializer.serialize(value)
+    //    def serialize[T](value: T)(implicit serializer: HTMLSerializer[T]): String = serializer.serialize(value)
     def apply[T](implicit serializer: HTMLSerializer[T]) = serializer
   }
   implicit object IntSerializer extends HTMLSerializer[Int] {
     override def serialize(value: Int): String = s"<div style='color: blue'>$value</div>"
   }
-//  println(HTMLSerializer.serialize(24)(IntSerializer))
-  // if we make serializer instances implicit then we can omit 2nd parameter like:
-  // implicit object IntSerializer...
+  //  println(HTMLSerializer.serialize(24)(IntSerializer))
+
+  /*  if we make serializer instances implicit then we can omit 2nd parameter like:
+         implicit object IntSerializer...
+  */
   println(HTMLSerializer[Int].serialize(24))
   println(HTMLSerializer[User].serialize(bob))
-  /* The biggest advantage of this approach is, we can just write "HTMLSerializer.serialize(value)" and it'll work if we have
-      implicit serializer instance available for the given value type
 
-    Even better design is, have an factory method apply in companion object which take an implicit serializer and just returns it
-      The good thing about this design is that when we call apply like: HTMLSerializer[User], we have access to entire type class interface.
-      i.e. not only to the serialize methods but other methods as well.
+  /*  The biggest advantage of this approach is, we can just write
+          HTMLSerializer.serialize(value)
+      and it'll work if we have implicit serializer instance available for the given value type
+
+    Even better design is, have an factory method `apply` in companion object which take an implicit serializer and just returns it
+      The good thing about this design is that when we call apply like:
+          HTMLSerializer[User]
+      we have access to entire type class interface i.e. not only to the serialize methods but other methods as well.
   */
-  HTMLSerializer[User] // here we have access to the entire type class interface
+  HTMLSerializer[User] // Super COOL : here we have access to the entire type class interface
 
+  /* ================================================================================================================ */
+
+  /* PART 3 */
   implicit class HTMLEnrichment[T](value: T) {
     def toHtml(implicit serializer: HTMLSerializer[T]) = serializer.serialize(value)
   }
   println(bob.toHtml)
-  // this will be rewritten by complier like println(new HTMLEnrichment[User](bob.toHtml(UserSerializer))
+  // this will be rewritten by compiler like println(new HTMLEnrichment[User](bob.toHtml(UserSerializer))
   // THIS IS COOL!!!
   println(24.toHtml)
 
-  /* Main elements to enhance existing types with type class:
-      - type classes --- MyTypeClassTemplate or HTMLSerializer[T]
-      - type class instances --- DateSerializer, UserSerializer, IntSerializer
-      - conversion/enrichment with implicit classes --- HTMLEnrichment
+  /*          KEY elements to enhance existing types with type class
+          1. type classes - - - MyTypeClassTemplate or HTMLSerializer[T]
+          2. type class instances - - - DateSerializer, UserSerializer, IntSerializer
+          3. conversion/enrichment with implicit classes - - - HTMLEnrichment
   */
+
 
   /*  Context Bounds  */
   def htmlBoilderplate[T](content: T)(implicit serializer: HTMLSerializer[T]): String =
