@@ -145,24 +145,28 @@ object TypeClasses_03 extends App {
   */
 
 
-  /*  Context Bounds  */
-  def htmlBoilderplate[T](content: T)(implicit serializer: HTMLSerializer[T]): String =
+  /*      Context Bounds   - I didn't liked it much, super unhealthy for readability POV   */
+  def htmlBoilerplate[T](content: T)(implicit serializer: HTMLSerializer[T]): String =
     s"<html><body>${content.toHtml(serializer)}</body></html>"
-  // This method can be rewritten with more compact syntax using context bounds like:
-  def htmlSugar[T : HTMLSerializer](content: T): String =
+
+  /*  This method can be rewritten with more compact syntax using context bounds like:  */
+  def htmlSugar[T : HTMLSerializer](content: T): String = // compiler magically passing implicit here.
     s"<html><body>${content.toHtml}</body></html>"
 
-  /*  implicitly  -- a cute method */
+
+  /*      implicitly  -- a cute method      */
   // we can get the implicit serializer value using implicitly method. ex:
   case class Permissions(mask: String) // somewhere in code
   implicit val defaultPermission = Permissions("0766") //somewhere else in code
   // if at some point I want to have this implicit value in a val, we can get it using implicitly like:
   val currPermission = implicitly[Permissions]
 
+
+
   // In the similar way, we can get the implicit value inside our "Context Bound" method like
   def htmlAnotherSugar[T: HTMLSerializer](content: T): String = {
-    val serialzer = implicitly[HTMLSerializer[T]]
-    s"<html><body>${content.toHtml(serialzer)}</body></html>"
+    val serializer = implicitly[HTMLSerializer[T]]
+    s"<html><body>${content.toHtml(serializer)}</body></html>"
     // Now we have best of both worlds.
   }
 
