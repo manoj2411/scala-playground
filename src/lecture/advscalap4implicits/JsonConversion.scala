@@ -2,7 +2,7 @@ package lecture.advscalap4implicits
 
 import java.util.Date
 
-object JSONSerialization extends App {
+object JsonConversion extends App {
   /* We have User, Post, Feed objects and we want serialize to JSON */
 
   case class User(name: String, age: Int, email: String)
