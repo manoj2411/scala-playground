@@ -55,9 +55,8 @@ object PatternMatching extends App {
     case Sum(a, b) => s"${showNew(a)} + ${showNew(b)}"
     case Prod(a, b) =>
       def showParenthesis(ex: Expr) = ex match {
-        case Number(_) => showNew(ex)
-        case Prod(_, _) => showNew(ex)
-        case _ => s"(${showNew(ex)})"
+        case Sum(_, _) => s"(${showNew(ex)})"
+        case _ => showNew(ex)
       }
       showParenthesis(a) + " * " + showParenthesis(b)
   }
